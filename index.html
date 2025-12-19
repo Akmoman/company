@@ -28,6 +28,27 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
+    <!-- Login Screen Overlay -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center flex-col gap-4 no-print">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center mx-4">
+            <div class="bg-blue-600 p-4 rounded-full w-fit mx-auto mb-6 shadow-lg">
+                <i data-lucide="lock" class="text-white w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">النظام مقفل</h2>
+            <p class="text-gray-500 mb-6 text-sm">الرجاء إدخال رمز المرور للوصول إلى البيانات</p>
+            
+            <form id="login-form" class="space-y-4">
+                <input type="password" id="login-password" placeholder="أدخل الرمز هنا" class="w-full p-3 border border-gray-300 rounded-lg text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" autofocus>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md">دخول للنظام</button>
+            </form>
+            <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden flex items-center justify-center gap-1">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                رمز المرور غير صحيح
+            </p>
+        </div>
+        <p class="text-gray-500 text-xs mt-4">نظام فوترة الموردين الآمن v1.0</p>
+    </div>
+
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm no-print">
         <div class="flex items-center gap-3">
@@ -365,6 +386,21 @@
 
     <!-- Application Logic -->
     <script>
+        // --- Login Logic ---
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('login-password').value;
+            if (pass === '2040') {
+                document.getElementById('login-screen').classList.add('hidden');
+                // Refresh icons after unlocking to ensure they render if any issues
+                lucide.createIcons();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-password').focus();
+            }
+        });
+
         // --- Data Initialization ---
         // تم إفراغ البيانات الافتراضية بناءً على طلب المستخدم
         const defaultSuppliers = [];
