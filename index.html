@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام فوترة الموردين</title>
+    <title>نظام فوترة الموردين المطور</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,35 +22,33 @@
             body, main { background: white; height: auto; overflow: visible; }
             .card { box-shadow: none; border: none; }
             table { width: 100%; border: 1px solid #ddd; }
-            th, td { border: 1px solid #ddd; padding: 8px; }
+            th, td { border: 1px solid #ddd; padding: 8px; font-size: 12px; }
+            .print-break-inside { break-inside: avoid; }
         }
+        /* Custom Scrollbar for tables */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Login Screen Overlay -->
+    <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center flex-col gap-4 no-print">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center mx-4">
             <div class="bg-blue-600 p-4 rounded-full w-fit mx-auto mb-6 shadow-lg">
                 <i data-lucide="lock" class="text-white w-8 h-8"></i>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">تسجيل الدخول</h2>
-            <p class="text-gray-500 mb-6 text-sm">أدخل رمز المرور الخاص بك للدخول</p>
-            
+            <p class="text-gray-500 mb-6 text-sm">أدخل رمز المرور للدخول</p>
             <form id="login-form" class="space-y-6">
-                <!-- Username field removed -->
-                <div class="text-right">
-                    <label class="text-xs text-gray-500 font-bold mb-1 block">رمز المرور / كلمة السر</label>
-                    <input type="password" id="login-password" placeholder="أدخل الرمز هنا" class="w-full p-4 border border-gray-300 rounded-lg text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none transition-all" required autofocus>
-                </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md text-lg">دخول</button>
+                <input type="password" id="login-password" placeholder="الرمز" class="w-full p-4 border border-gray-300 rounded-lg text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none" required autofocus>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md text-lg">دخول</button>
             </form>
-            <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden flex items-center justify-center gap-1">
-                <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                <span id="login-error-text">رمز المرور غير صحيح</span>
-            </p>
+            <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden">رمز المرور غير صحيح</p>
         </div>
-        <p class="text-gray-500 text-xs mt-4">نظام فوترة الموردين v2.1</p>
+        <p class="text-gray-500 text-xs mt-4">V3.0 - FOC & Stock Support</p>
     </div>
 
     <!-- Header -->
@@ -62,30 +60,17 @@
             <div>
                 <h1 class="text-xl font-bold text-gray-800">نظام فوترة الموردين</h1>
                 <div class="flex items-center gap-2">
-                    <p class="text-xs text-gray-500" id="header-subtitle">إدارة المدفوعات والسلع</p>
                     <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600 font-bold" id="current-user-display"></span>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full hidden sm:flex">
-                <i data-lucide="save" class="w-3 h-3"></i>
-                <span>حفظ تلقائي</span>
-            </div>
-            <div class="text-left hidden sm:block border-r border-gray-200 pr-4 mr-4">
-                <p class="text-sm text-gray-500">إجمالي المستحق للدفع</p>
+            <div class="hidden sm:block text-left border-r border-gray-200 pr-4 mr-4">
+                <p class="text-xs text-gray-500">إجمالي المستحق</p>
                 <p class="text-lg font-bold text-red-600" id="header-total-due">0.000 ر.ع</p>
             </div>
-            
-            <button onclick="logout()" class="p-2 text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors" title="تسجيل الخروج">
-                <i data-lucide="log-out" class="w-5 h-5"></i>
-                <span class="hidden sm:inline text-sm font-bold">خروج</span>
-            </button>
-
-            <!-- Mobile Menu Button -->
-            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-600">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
+            <button onclick="logout()" class="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="خروج"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-600"><i data-lucide="menu" class="w-6 h-6"></i></button>
         </div>
     </header>
 
@@ -93,33 +78,14 @@
         
         <!-- Sidebar -->
         <aside id="sidebar" class="w-full md:w-64 bg-white border-l border-gray-200 p-4 space-y-2 hidden md:block no-print transition-all">
-            <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-blue-700 bg-blue-50 font-bold" data-tab="dashboard">
-                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                <span>لوحة التحكم</span>
-            </button>
-            <button onclick="switchTab('invoices')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="invoices">
-                <i data-lucide="file-plus" class="w-5 h-5"></i>
-                <span>تسجيل فاتورة</span>
-            </button>
-            <button onclick="switchTab('suppliers')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="suppliers">
-                <i data-lucide="users" class="w-5 h-5"></i>
-                <span>إدارة الموردين</span>
-            </button>
-            <button onclick="switchTab('reports')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="reports">
-                <i data-lucide="printer" class="w-5 h-5"></i>
-                <span>التقارير الشاملة</span>
-            </button>
-            
+            <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-blue-700 bg-blue-50 font-bold" data-tab="dashboard"><i data-lucide="layout-dashboard"></i><span>لوحة التحكم</span></button>
+            <button onclick="switchTab('invoices')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50" data-tab="invoices"><i data-lucide="file-plus"></i><span>فاتورة جديدة</span></button>
+            <button onclick="switchTab('suppliers')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50" data-tab="suppliers"><i data-lucide="users"></i><span>الموردين</span></button>
+            <button onclick="switchTab('reports')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50" data-tab="reports"><i data-lucide="printer"></i><span>التقارير</span></button>
             <div id="admin-menu-items" class="hidden">
                 <div class="border-t my-2 border-gray-100"></div>
-                <button onclick="switchTab('users')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="users">
-                    <i data-lucide="user-cog" class="w-5 h-5"></i>
-                    <span>إدارة المستخدمين</span>
-                </button>
-                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="settings">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                    <span>إدارة البيانات</span>
-                </button>
+                <button onclick="switchTab('users')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50" data-tab="users"><i data-lucide="user-cog"></i><span>المستخدمين</span></button>
+                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50" data-tab="settings"><i data-lucide="settings"></i><span>الإعدادات</span></button>
             </div>
         </aside>
 
@@ -128,906 +94,622 @@
             
             <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="view-section space-y-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">نظرة عامة</h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-r-4 border-r-blue-500">
-                        <p class="text-gray-500 mb-1">إجمالي المشتريات</p>
-                        <h3 class="text-3xl font-bold text-gray-800"><span id="dash-total">0.000</span> <span class="text-sm font-normal">ر.ع</span></h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-r-4 border-r-green-500">
-                        <p class="text-gray-500 mb-1">المدفوعات المكتملة</p>
-                        <h3 class="text-3xl font-bold text-green-600"><span id="dash-paid">0.000</span> <span class="text-sm font-normal">ر.ع</span></h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-r-4 border-r-red-500">
-                        <p class="text-gray-500 mb-1">المستحق للدفع</p>
-                        <h3 class="text-3xl font-bold text-red-600"><span id="dash-due">0.000</span> <span class="text-sm font-normal">ر.ع</span></h3>
-                    </div>
+                    <div class="bg-white p-6 rounded-xl border-r-4 border-r-blue-500 shadow-sm"><p class="text-gray-500">المشتريات</p><h3 class="text-3xl font-bold" id="dash-total">0.000</h3></div>
+                    <div class="bg-white p-6 rounded-xl border-r-4 border-r-green-500 shadow-sm"><p class="text-gray-500">المدفوعات</p><h3 class="text-3xl font-bold text-green-600" id="dash-paid">0.000</h3></div>
+                    <div class="bg-white p-6 rounded-xl border-r-4 border-r-red-500 shadow-sm"><p class="text-gray-500">المستحق</p><h3 class="text-3xl font-bold text-red-600" id="dash-due">0.000</h3></div>
                 </div>
-
-                <div class="mt-8">
-                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="calendar" class="text-gray-500 w-5 h-5"></i>
-                        آخر المعاملات والاستحقاقات
-                    </h3>
-                    <div class="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
-                        <table class="w-full text-right">
-                            <thead class="bg-gray-50 text-gray-600 text-sm">
-                                <tr>
-                                    <th class="p-4">التاريخ</th>
-                                    <th class="p-4">المورد</th>
-                                    <th class="p-4">السلعة</th>
-                                    <th class="p-4">الإجمالي</th>
-                                    <th class="p-4">تاريخ الاستحقاق</th>
-                                    <th class="p-4">الحالة / المتبقي</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dash-table-body" class="divide-y divide-gray-100">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                        <p id="dash-empty-msg" class="p-8 text-center text-gray-400 hidden">لا توجد معاملات مسجلة</p>
-                    </div>
+                
+                <h3 class="font-bold text-lg mt-8 mb-4">آخر الفواتير المسجلة</h3>
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-right">
+                        <thead class="bg-gray-50 text-xs text-gray-600">
+                            <tr><th class="p-3">رقم الفاتورة</th><th class="p-3">المورد</th><th class="p-3">التاريخ</th><th class="p-3">الاستحقاق</th><th class="p-3">الإجمالي</th><th class="p-3">الحالة</th></tr>
+                        </thead>
+                        <tbody id="dash-table-body" class="divide-y divide-gray-100 text-sm"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- VIEW: ADD INVOICE -->
-            <div id="view-invoices" class="view-section hidden max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                    <i data-lucide="file-plus" class="text-blue-600 w-6 h-6"></i>
-                    تسجيل فاتورة جديدة
-                </h2>
-                
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-                    <form id="invoice-form" class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">اختر المورد</label>
-                            <select id="inv-supplier" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
-                                <option value="">-- اختر من القائمة --</option>
-                                <!-- Populated by JS -->
+            <!-- VIEW: ADD INVOICE (Master-Detail) -->
+            <div id="view-invoices" class="view-section hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="file-plus" class="text-blue-600"></i>فاتورة شراء جديدة</h2>
+                    <button onclick="clearInvoiceForm()" class="text-sm text-red-500 hover:text-red-700">مسح النموذج</button>
+                </div>
+
+                <!-- 1. Invoice Header (Master) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">المورد</label>
+                            <select id="inv-supplier" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                                <option value="">اختر المورد...</option>
                             </select>
-                            <p id="no-suppliers-msg" class="text-red-500 text-xs mt-1 hidden">يجب إضافة موردين أولاً من قائمة "إدارة الموردين"</p>
                         </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">اسم السلعة / الخدمة</label>
-                                <input type="text" id="inv-item" required placeholder="مثال: أسمنت، أجهزة كمبيوتر..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">الكمية</label>
-                                <input type="number" id="inv-qty" min="1" value="1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="calculateTotal()">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">سعر الوحدة (ر.ع)</label>
-                                <input type="number" id="inv-price" min="0" step="0.001" value="0" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="calculateTotal()">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الفاتورة</label>
-                                <input type="date" id="inv-date" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الاستحقاق (موعد الدفع)</label>
-                                <input type="date" id="inv-due-date" required class="w-full p-3 border border-blue-300 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <p class="text-xs text-gray-500 mt-1">افتراضياً 30 يوماً من اليوم</p>
-                            </div>
-                        </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">حالة الدفع</label>
-                            <div class="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="inv-status" value="unpaid" checked>
-                                    <span class="text-red-600 font-medium">غير مدفوع (آجل)</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="inv-status" value="paid">
-                                    <span class="text-green-600 font-medium">مدفوع (كاش)</span>
-                                </label>
-                            </div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">رقم الفاتورة (للمورد)</label>
+                            <input type="text" id="inv-number" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500" placeholder="مثال: 2520125">
                         </div>
-
-                        <div class="bg-blue-50 p-4 rounded-lg flex justify-between items-center">
-                            <span class="text-blue-800 font-medium">الإجمالي المحسوب:</span>
-                            <span class="text-2xl font-bold text-blue-800">
-                                <span id="inv-total-display">0.000</span> ر.ع
-                            </span>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">تاريخ الفاتورة</label>
+                            <input type="date" id="inv-date" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">تاريخ الاستحقاق</label>
+                            <input type="date" id="inv-due-date" class="w-full p-2 border border-blue-300 bg-blue-50 rounded focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
 
-                        <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-700 py-3 rounded-lg font-medium flex items-center justify-center gap-2 text-lg transition-colors">
-                            <i data-lucide="plus" class="w-5 h-5"></i>
-                            حفظ الفاتورة
-                        </button>
-                    </form>
+                <!-- 2. Add Items (Detail Input) -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 relative">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="shopping-cart" class="w-4 h-4"></i>إضافة الأصناف للفاتورة</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                        <div class="md:col-span-3">
+                            <label class="text-xs block mb-1">اسم الصنف / البيان</label>
+                            <input type="text" id="item-name" placeholder="اسم المنتج" class="w-full p-2 border rounded text-sm">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-xs block mb-1">UOM</label>
+                            <input type="text" id="item-uom" placeholder="PAK30" class="w-full p-2 border rounded text-sm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs block mb-1">تاريخ الانتهاء</label>
+                            <input type="date" id="item-expiry" class="w-full p-2 border rounded text-sm">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-xs block mb-1 text-blue-600">الرصيد الحالي</label>
+                            <input type="number" id="item-stock" placeholder="0" class="w-full p-2 border border-blue-200 bg-blue-50 rounded text-sm">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-xs block mb-1">الكمية</label>
+                            <input type="number" id="item-qty" value="1" min="1" class="w-full p-2 border rounded text-sm font-bold" oninput="calcItemTotal()">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="text-xs block mb-1">السعر (ر.ع)</label>
+                            <input type="number" id="item-price" value="0" step="0.001" min="0" class="w-full p-2 border rounded text-sm" oninput="calcItemTotal()">
+                        </div>
+                        <div class="md:col-span-1 flex items-center gap-2 pb-2">
+                            <input type="checkbox" id="item-foc" class="w-4 h-4 text-blue-600" onchange="toggleFOC()">
+                            <label for="item-foc" class="text-xs font-bold cursor-pointer select-none">FOC<br><span class="text-[10px] text-gray-500">مجاني</span></label>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button onclick="addInvoiceItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-bold flex items-center justify-center gap-1">
+                                <i data-lucide="plus"></i> إضافة
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-left text-xs text-gray-500">
+                        الإجمالي للصنف: <span id="item-line-total" class="font-bold text-blue-600">0.000</span> ر.ع
+                    </div>
+                </div>
+
+                <!-- 3. Items List Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-gray-100 text-gray-600 border-b">
+                            <tr>
+                                <th class="p-3">#</th>
+                                <th class="p-3">الصنف</th>
+                                <th class="p-3">UOM</th>
+                                <th class="p-3">الانتهاء</th>
+                                <th class="p-3 text-center">رصيد سابق</th>
+                                <th class="p-3 text-center">الكمية</th>
+                                <th class="p-3">السعر</th>
+                                <th class="p-3">الإجمالي</th>
+                                <th class="p-3 text-center">حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-items-body" class="divide-y divide-gray-50">
+                            <tr><td colspan="9" class="p-4 text-center text-gray-400">لا توجد أصناف مضافة بعد</td></tr>
+                        </tbody>
+                        <tfoot class="bg-blue-50 font-bold border-t border-blue-100">
+                            <tr>
+                                <td colspan="7" class="p-3 text-left pl-4">إجمالي الفاتورة:</td>
+                                <td colspan="2" class="p-3 text-blue-700 text-lg"><span id="invoice-grand-total">0.000</span> ر.ع</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- 4. Save Actions -->
+                <div class="flex gap-4 items-center bg-white p-4 rounded-xl border border-gray-200">
+                    <div class="flex-1">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="inv-paid-status" class="w-5 h-5 text-green-600">
+                            <span class="font-medium">دفع فوري (كاش)</span>
+                        </label>
+                    </div>
+                    <button onclick="saveFullInvoice()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-sm flex justify-center items-center gap-2">
+                        <i data-lucide="save"></i> حفظ الفاتورة كاملة
+                    </button>
                 </div>
             </div>
 
             <!-- VIEW: SUPPLIERS -->
             <div id="view-suppliers" class="view-section hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">قائمة الموردين</h2>
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Add Supplier Form -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit md:col-span-1">
-                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                            <i data-lucide="user-plus" class="text-blue-600 w-5 h-5"></i>
-                            إضافة مورد جديد
-                        </h3>
-                        <form id="supplier-form" class="space-y-4">
-                            <input type="text" id="sup-name" placeholder="اسم المورد / الشركة" required class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                            <input type="text" id="sup-phone" placeholder="رقم الهاتف (اختياري)" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                            <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-lg font-medium">إضافة</button>
+                    <div class="bg-white p-6 rounded-xl border h-fit md:col-span-1">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="text-blue-600"></i>مورد جديد</h3>
+                        <form id="supplier-form" class="space-y-3">
+                            <input type="text" id="sup-name" placeholder="اسم الشركة / المورد" required class="w-full p-2 border rounded text-sm">
+                            <input type="text" id="sup-phone" placeholder="رقم الهاتف" class="w-full p-2 border rounded text-sm">
+                            <input type="email" id="sup-email" placeholder="البريد الإلكتروني" class="w-full p-2 border rounded text-sm">
+                            <input type="text" id="sup-bank" placeholder="رقم الحساب البنكي" class="w-full p-2 border rounded text-sm">
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">حفظ</button>
                         </form>
                     </div>
-
-                    <!-- Suppliers List -->
-                    <div id="suppliers-list" class="md:col-span-2 space-y-3">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="suppliers-list" class="md:col-span-2 space-y-3"></div>
                 </div>
             </div>
 
             <!-- VIEW: REPORTS -->
             <div id="view-reports" class="view-section hidden space-y-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
-                    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                        <i data-lucide="printer" class="text-blue-600 w-6 h-6"></i>
-                        تقرير كشف حساب
-                    </h2>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <select id="report-supplier-filter" class="p-2 border border-gray-300 rounded-lg bg-white flex-1 md:w-64" onchange="updateReport()">
-                            <option value="all">جميع الموردين</option>
-                            <!-- Populated by JS -->
-                        </select>
-                        <button onclick="window.print()" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-2">
-                            <i data-lucide="printer" class="w-4 h-4"></i>
-                            طباعة
-                        </button>
+                <div class="flex justify-between items-center no-print">
+                    <h2 class="text-2xl font-bold flex gap-2"><i data-lucide="file-text" class="text-blue-600"></i>تقارير الفواتير</h2>
+                    <div class="flex gap-2">
+                        <select id="report-filter" class="p-2 border rounded bg-white" onchange="renderReports()"><option value="all">الكل</option></select>
+                        <button onclick="window.print()" class="px-4 py-2 border rounded hover:bg-gray-50 flex gap-2"><i data-lucide="printer"></i>طباعة</button>
                     </div>
                 </div>
-
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 print:shadow-none print:border-none print:p-0">
-                    <div class="mb-8 border-b pb-4">
-                        <div class="flex justify-between items-center mb-4">
-                            <h1 class="text-3xl font-bold text-gray-900">تقرير المشتريات والمدفوعات</h1>
-                            <div class="text-left text-sm text-gray-500">
-                                <p>تاريخ التقرير: <span id="report-date"></span></p>
-                            </div>
-                        </div>
-                        <div id="report-header-filter" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-100">
-                            <h3 class="text-blue-900 font-bold text-lg">المورد: <span id="report-supplier-name"></span></h3>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-8 mb-8">
-                        <div class="bg-gray-50 p-4 rounded border">
-                            <p class="text-sm text-gray-500">إجمالي المعاملات</p>
-                            <p class="text-2xl font-bold text-gray-800"><span id="report-total-sum">0.000</span> ر.ع</p>
-                        </div>
-                        <div class="bg-red-50 p-4 rounded border border-red-100">
-                            <p class="text-sm text-red-500">المبلغ المستحق (غير مدفوع)</p>
-                            <p class="text-2xl font-bold text-red-700"><span id="report-due-sum">0.000</span> ر.ع</p>
-                        </div>
-                    </div>
-
-                    <table class="w-full text-right border-collapse">
-                        <thead>
-                            <tr class="border-b-2 border-gray-300">
-                                <th class="py-3 px-2 text-gray-600">التاريخ</th>
-                                <th class="py-3 px-2 text-gray-600 filter-col">المورد</th>
-                                <th class="py-3 px-2 text-gray-600">السلعة</th>
-                                <th class="py-3 px-2 text-gray-600 text-center">الكمية</th>
-                                <th class="py-3 px-2 text-gray-600">الإجمالي</th>
-                                <th class="py-3 px-2 text-gray-600">الاستحقاق</th>
-                                <th class="py-3 px-2 text-gray-600 text-center">الوقت المتبقي</th>
-                                <th class="py-3 px-2 text-gray-600 text-center">الحالة</th>
-                                <th class="py-3 px-2 text-center no-print">إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-table-body" class="divide-y divide-gray-200">
-                            <!-- Populated by JS -->
-                        </tbody>
-                        <tfoot>
-                            <tr class="border-t-2 border-gray-300 bg-gray-50 font-bold">
-                                <td colspan="4" class="py-4 px-2 text-left pl-8">المجموع الكلي:</td>
-                                <td class="py-4 px-2 text-blue-800"><span id="report-footer-total">0.000</span> ر.ع</td>
-                                <td colspan="4"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                <div id="reports-container" class="space-y-8"></div>
             </div>
 
-            <!-- VIEW: USER MANAGEMENT (Admin Only) -->
+            <!-- Other Views (Users, Settings) remain similar but hidden for brevity in this specific update -->
             <div id="view-users" class="view-section hidden space-y-6">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <i data-lucide="user-cog" class="text-blue-600 w-6 h-6"></i>
-                    إدارة المستخدمين
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Add User Form -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit md:col-span-1">
-                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                            <i data-lucide="plus-circle" class="text-blue-600 w-5 h-5"></i>
-                            إضافة مستخدم جديد
-                        </h3>
-                        <form id="add-user-form" class="space-y-4">
-                            <div>
-                                <label class="text-xs text-gray-500 font-bold">الاسم الكامل</label>
-                                <input type="text" id="new-user-fullname" required class="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="مثال: علي محمد">
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-500 font-bold">رمز المرور</label>
-                                <input type="text" id="new-user-password" required class="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="مثال: 1234">
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-500 font-bold">الصلاحية</label>
-                                <select id="new-user-role" class="w-full p-2 border border-gray-300 rounded mt-1 bg-white">
-                                    <option value="user">مستخدم عادي (فواتير فقط)</option>
-                                    <option value="admin">مدير (صلاحيات كاملة)</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-lg font-medium">حفظ المستخدم</button>
-                        </form>
+                <!-- Simple User Management UI -->
+                <div class="bg-white p-6 rounded shadow border">
+                    <h3 class="font-bold mb-4">إضافة مستخدم (رمز المرور فقط)</h3>
+                    <div class="flex gap-2 mb-6">
+                        <input id="new-user-name" placeholder="الاسم" class="border p-2 rounded">
+                        <input id="new-user-pass" placeholder="الرمز" class="border p-2 rounded">
+                        <select id="new-user-role" class="border p-2 rounded"><option value="user">مستخدم</option><option value="admin">مدير</option></select>
+                        <button onclick="addUser()" class="bg-blue-600 text-white px-4 rounded">إضافة</button>
                     </div>
-
-                    <!-- Users List -->
-                    <div class="md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 bg-gray-50">
-                            <h3 class="font-bold text-gray-700">قائمة الحسابات المسجلة</h3>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right">
-                                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
-                                    <tr>
-                                        <th class="p-4">الاسم الكامل</th>
-                                        <th class="p-4">الصلاحية</th>
-                                        <th class="p-4">الحالة</th>
-                                        <th class="p-4 text-center">إجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-table-body" class="divide-y divide-gray-100">
-                                    <!-- Populated by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <div id="users-list" class="space-y-2"></div>
                 </div>
             </div>
-
-            <!-- VIEW: SETTINGS -->
-            <div id="view-settings" class="view-section hidden max-w-2xl mx-auto space-y-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                    <i data-lucide="settings" class="text-blue-600 w-6 h-6"></i>
-                    إدارة البيانات وقاعدة البيانات
-                </h2>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
-                    <div>
-                        <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center gap-2">
-                            <i data-lucide="download" class="text-blue-500 w-5 h-5"></i>
-                            تصدير نسخة احتياطية
-                        </h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            قم بتحميل ملف JSON يحتوي على جميع البيانات (موردين، فواتير، ومستخدمين).
-                        </p>
-                        <button onclick="exportData()" class="w-full bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2">
-                            <i data-lucide="download" class="w-4 h-4"></i>
-                            تحميل قاعدة البيانات
-                        </button>
-                    </div>
-
-                    <div class="border-t pt-6">
-                        <h3 class="font-bold text-lg text-gray-800 mb-2 flex items-center gap-2">
-                            <i data-lucide="upload" class="text-blue-500 w-5 h-5"></i>
-                            استيراد نسخة احتياطية
-                        </h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            استرجع البيانات من ملف سابق. <span class="text-red-500 font-bold">تنبيه: سيتم استبدال البيانات الحالية.</span>
-                        </p>
-                        <div class="relative">
-                            <input type="file" accept=".json" onchange="importData(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <button class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2">
-                                <i data-lucide="upload" class="w-4 h-4"></i>
-                                اختر ملف النسخة الاحتياطية
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="border-t pt-6">
-                        <h3 class="font-bold text-lg text-red-600 mb-2 flex items-center gap-2">
-                            <i data-lucide="refresh-cw" class="text-red-500 w-5 h-5"></i>
-                            إعادة ضبط النظام
-                        </h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            حذف جميع البيانات الحالية والعودة إلى البيانات الافتراضية.
-                        </p>
-                        <button onclick="resetData()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            حذف البيانات وإعادة الضبط
-                        </button>
-                    </div>
+            
+            <div id="view-settings" class="view-section hidden bg-white p-6 rounded shadow">
+                <h3 class="font-bold mb-4">قاعدة البيانات</h3>
+                <div class="flex gap-4">
+                    <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded flex gap-2"><i data-lucide="download"></i>تصدير</button>
+                    <label class="bg-blue-600 text-white px-4 py-2 rounded flex gap-2 cursor-pointer"><i data-lucide="upload"></i>استيراد<input type="file" hidden onchange="importData(this)"></label>
+                    <button onclick="resetData()" class="bg-red-600 text-white px-4 py-2 rounded flex gap-2"><i data-lucide="trash"></i>تصفير</button>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- Application Logic -->
+    <!-- Logic -->
     <script>
-        // --- Users & Auth Logic ---
-        
-        // Default Admin User (Password Only)
-        const defaultUsers = [
-            { id: 1, password: 'akm1983', role: 'admin', name: 'المدير العام', active: true }
-        ];
-
-        // Load users from storage
+        // --- State Management ---
+        const defaultUsers = [{ id: 1, password: '2040', role: 'admin', name: 'المدير العام', active: true }];
         let users = JSON.parse(localStorage.getItem('billing_users')) || defaultUsers;
+        let suppliers = JSON.parse(localStorage.getItem('billing_suppliers')) || [];
+        // New Data Structure: invoices array contains Invoice Objects, which contain an 'items' array
+        let invoices = JSON.parse(localStorage.getItem('billing_invoices_v2')) || [];
         
-        // Data Migration fix: If old format users (with username) exist, keep them but ensure 'active' flag exists
-        if(users.length > 0 && typeof users[0].active === 'undefined') {
-            users = users.map(u => ({...u, active: true}));
+        // ** Force Admin Password Update (Security Fix) **
+        const adminUser = users.find(u => u.id === 1);
+        if (adminUser) {
+            adminUser.password = '2040'; // Enforce 2040
+            adminUser.role = 'admin';
+            adminUser.active = true;
+            localStorage.setItem('billing_users', JSON.stringify(users));
+        } else {
+            // Re-create if missing
+            users.unshift({ id: 1, password: '2040', role: 'admin', name: 'المدير العام', active: true });
             localStorage.setItem('billing_users', JSON.stringify(users));
         }
 
         let currentUser = null;
+        let tempItems = []; // Temporary holding items for new invoice
 
-        // Login Form Handler
+        // --- Auth ---
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const passIn = document.getElementById('login-password').value.trim();
-            
-            // Find user by password only
-            const foundUser = users.find(u => u.password === passIn);
-
-            const errorText = document.getElementById('login-error-text');
-            const errorDiv = document.getElementById('login-error');
-
-            if (foundUser) {
-                if (foundUser.active === false) {
-                    errorText.textContent = 'تم تعطيل هذا الحساب. راجع المدير.';
-                    errorDiv.classList.remove('hidden');
-                    return;
-                }
-
-                currentUser = foundUser;
+            const pass = document.getElementById('login-password').value.trim();
+            const user = users.find(u => u.password === pass);
+            if(user && user.active){
+                currentUser = user;
                 document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('current-user-display').textContent = foundUser.name;
-                
-                // Show/Hide Admin menus based on role
-                if (currentUser.role === 'admin') {
-                    document.getElementById('admin-menu-items').classList.remove('hidden');
-                } else {
-                    document.getElementById('admin-menu-items').classList.add('hidden');
-                }
-
-                lucide.createIcons();
-                
-                if(currentUser.role !== 'admin') {
-                    switchTab('dashboard');
-                } else {
-                    renderUsersTable();
-                }
-
-                // Reset Login Form
-                document.getElementById('login-password').value = '';
-                errorDiv.classList.add('hidden');
-
+                document.getElementById('current-user-display').textContent = user.name;
+                document.getElementById('admin-menu-items').classList.toggle('hidden', user.role !== 'admin');
+                renderAll();
             } else {
-                errorText.textContent = 'رمز المرور غير صحيح';
-                errorDiv.classList.remove('hidden');
-                document.getElementById('login-password').value = '';
+                document.getElementById('login-error').classList.remove('hidden');
+                document.getElementById('login-error').textContent = user ? 'الحساب معطل' : 'الرمز غير صحيح';
             }
         });
 
-        function logout() {
-            currentUser = null;
-            document.getElementById('login-screen').classList.remove('hidden');
-            switchTab('dashboard'); 
+        function logout() { location.reload(); }
+
+        // --- Invoice Logic (Master-Detail) ---
+        
+        function toggleFOC() {
+            const isFoc = document.getElementById('item-foc').checked;
+            const priceInput = document.getElementById('item-price');
+            if(isFoc) {
+                priceInput.value = 0;
+                priceInput.disabled = true;
+            } else {
+                priceInput.disabled = false;
+            }
+            calcItemTotal();
         }
 
-        // Add User Handler
-        document.getElementById('add-user-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('new-user-fullname').value.trim();
-            const password = document.getElementById('new-user-password').value.trim();
-            const role = document.getElementById('new-user-role').value;
+        function calcItemTotal() {
+            const qty = parseFloat(document.getElementById('item-qty').value) || 0;
+            const price = parseFloat(document.getElementById('item-price').value) || 0;
+            document.getElementById('item-line-total').textContent = (qty * price).toFixed(3);
+        }
 
-            // Check if password already exists (since it's the unique key now)
-            if (users.some(u => u.password === password)) {
-                alert('رمز المرور هذا مستخدم بالفعل، الرجاء اختيار رمز آخر.');
-                return;
-            }
+        function addInvoiceItem() {
+            const name = document.getElementById('item-name').value;
+            if(!name) return alert("أدخل اسم الصنف");
 
-            const id = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-            users.push({ id, password, name, role, active: true });
-            saveData();
+            const item = {
+                id: Date.now(),
+                name: name,
+                uom: document.getElementById('item-uom').value || '-',
+                expiry: document.getElementById('item-expiry').value || '-',
+                stock: document.getElementById('item-stock').value || 0, // Recorded for reference
+                qty: parseFloat(document.getElementById('item-qty').value) || 0,
+                price: parseFloat(document.getElementById('item-price').value) || 0,
+                isFoc: document.getElementById('item-foc').checked
+            };
+            item.total = item.qty * item.price;
+
+            tempItems.push(item);
+            renderTempItems();
             
-            // Reset form
-            document.getElementById('new-user-fullname').value = '';
-            document.getElementById('new-user-password').value = '';
-            
-            renderUsersTable();
-            alert('تم إضافة المستخدم بنجاح');
-        });
+            // Clear Item Inputs
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-uom').value = '';
+            document.getElementById('item-expiry').value = '';
+            document.getElementById('item-stock').value = '';
+            document.getElementById('item-qty').value = 1;
+            document.getElementById('item-price').value = 0;
+            document.getElementById('item-foc').checked = false;
+            document.getElementById('item-price').disabled = false;
+            document.getElementById('item-name').focus();
+        }
 
-        function renderUsersTable() {
-            const tbody = document.getElementById('users-table-body');
+        function removeTempItem(id) {
+            tempItems = tempItems.filter(i => i.id !== id);
+            renderTempItems();
+        }
+
+        function renderTempItems() {
+            const tbody = document.getElementById('invoice-items-body');
             tbody.innerHTML = '';
-            
-            users.forEach(user => {
-                const roleBadge = user.role === 'admin' 
-                    ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">مدير</span>' 
-                    : '<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">مستخدم</span>';
+            let grandTotal = 0;
+
+            tempItems.forEach((item, index) => {
+                grandTotal += item.total;
+                const focBadge = item.isFoc ? '<span class="bg-purple-100 text-purple-700 text-xs px-2 rounded">FOC</span>' : '';
                 
-                const statusBadge = user.active 
-                    ? '<span class="text-green-600 font-bold text-xs">نشط</span>'
-                    : '<span class="text-red-600 font-bold text-xs">معطل</span>';
-
-                let actionBtns = '';
-                
-                // Protect Main Admin (ID 1)
-                if (user.id === 1) {
-                    actionBtns = '<span class="text-gray-300 text-xs italic">محمي</span>';
-                } else {
-                    const toggleIcon = user.active ? 'lock' : 'unlock';
-                    const toggleColor = user.active ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50';
-                    const toggleTitle = user.active ? 'تعطيل الحساب' : 'تفعيل الحساب';
-
-                    actionBtns = `
-                        <div class="flex justify-center gap-2">
-                            <button onclick="toggleUserStatus(${user.id})" class="${toggleColor} p-1 rounded" title="${toggleTitle}">
-                                <i data-lucide="${toggleIcon}" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteUser(${user.id})" class="text-red-500 hover:bg-red-50 p-1 rounded" title="حذف نهائي">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-
-                const row = `
-                    <tr class="hover:bg-gray-50 border-b border-gray-100 last:border-0 ${!user.active ? 'bg-red-50' : ''}">
-                        <td class="p-4 font-medium text-gray-700">${user.name}</td>
-                        <td class="p-4">${roleBadge}</td>
-                        <td class="p-4">${statusBadge}</td>
-                        <td class="p-4 text-center">${actionBtns}</td>
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-3">${index + 1}</td>
+                        <td class="p-3 font-bold">${item.name} ${focBadge}</td>
+                        <td class="p-3 text-gray-500">${item.uom}</td>
+                        <td class="p-3 text-gray-500">${item.expiry}</td>
+                        <td class="p-3 text-center text-blue-600">${item.stock}</td>
+                        <td class="p-3 text-center font-bold">${item.qty}</td>
+                        <td class="p-3">${item.price.toFixed(3)}</td>
+                        <td class="p-3 font-bold">${item.total.toFixed(3)}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="removeTempItem(${item.id})" class="text-red-500 hover:bg-red-50 p-1 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
             });
-            lucide.createIcons();
+
+            if(tempItems.length === 0) tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-gray-400">ابدأ بإضافة الأصناف من النموذج أعلاه</td></tr>';
+            
+            document.getElementById('invoice-grand-total').textContent = grandTotal.toFixed(3);
         }
 
-        window.deleteUser = (id) => {
-            if(confirm('هل أنت متأكد من حذف هذا المستخدم نهائياً؟')) {
-                users = users.filter(u => u.id !== id);
-                saveData();
-                renderUsersTable();
-            }
-        };
+        function saveFullInvoice() {
+            const supplierId = document.getElementById('inv-supplier').value;
+            const invNumber = document.getElementById('inv-number').value;
+            const date = document.getElementById('inv-date').value;
+            
+            if(!supplierId || !invNumber || !date) return alert("الرجاء إكمال بيانات ترويسة الفاتورة (المورد، الرقم، التاريخ)");
+            if(tempItems.length === 0) return alert("لا يمكن حفظ فاتورة فارغة! أضف أصنافاً أولاً.");
 
-        window.toggleUserStatus = (id) => {
-            const user = users.find(u => u.id === id);
-            if(user) {
-                user.active = !user.active;
-                saveData();
-                renderUsersTable();
-            }
-        };
+            const totalAmount = tempItems.reduce((sum, i) => sum + i.total, 0);
+            
+            const newInvoice = {
+                id: Date.now(),
+                invoiceNumber: invNumber,
+                supplierId: parseInt(supplierId),
+                date: date,
+                dueDate: document.getElementById('inv-due-date').value || date,
+                items: [...tempItems], // Copy items
+                totalAmount: totalAmount,
+                status: document.getElementById('inv-paid-status').checked ? 'paid' : 'unpaid',
+                createdBy: currentUser.name
+            };
 
-        // --- Data Initialization (Existing) ---
-        const defaultSuppliers = [];
-        const defaultInvoices = [];
+            invoices.push(newInvoice);
+            localStorage.setItem('billing_invoices_v2', JSON.stringify(invoices));
+            
+            alert("تم حفظ الفاتورة بنجاح!");
+            clearInvoiceForm();
+            switchTab('dashboard'); // Go to dashboard to see it
+        }
 
-        let suppliers = JSON.parse(localStorage.getItem('billing_suppliers')) || defaultSuppliers;
-        let invoices = JSON.parse(localStorage.getItem('billing_invoices')) || defaultInvoices;
+        function clearInvoiceForm() {
+            tempItems = [];
+            renderTempItems();
+            document.getElementById('inv-number').value = '';
+            document.getElementById('inv-paid-status').checked = false;
+        }
 
-        // --- Helper Functions ---
-        const saveData = () => {
+        // --- Suppliers Logic ---
+        document.getElementById('supplier-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const s = {
+                id: Date.now(),
+                name: document.getElementById('sup-name').value,
+                phone: document.getElementById('sup-phone').value,
+                email: document.getElementById('sup-email').value,
+                bank: document.getElementById('sup-bank').value
+            };
+            suppliers.push(s);
             localStorage.setItem('billing_suppliers', JSON.stringify(suppliers));
-            localStorage.setItem('billing_invoices', JSON.stringify(invoices));
-            localStorage.setItem('billing_users', JSON.stringify(users)); // Save Users too
-            renderAll();
-        };
+            e.target.reset();
+            renderSuppliers();
+            populateSupplierSelect();
+        });
 
-        const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' ' + 'ر.ع';
-
-        const getDaysRemaining = (dueDate) => {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const due = new Date(dueDate);
-            const diffTime = due - today;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        };
-
-        const getDefaultDueDate = () => {
-            const date = new Date();
-            date.setDate(date.getDate() + 30);
-            return date.toISOString().split('T')[0];
-        };
-
-        // --- UI Rendering ---
-        
-        function switchTab(tabId) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            // Show selected view
-            document.getElementById('view-' + tabId).classList.remove('hidden');
-            
-            // Update sidebar active state
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.tab === tabId) {
-                    btn.classList.add('text-blue-700', 'bg-blue-50', 'font-bold');
-                    btn.classList.remove('text-gray-600', 'hover:bg-gray-50');
-                } else {
-                    btn.classList.remove('text-blue-700', 'bg-blue-50', 'font-bold');
-                    btn.classList.add('text-gray-600', 'hover:bg-gray-50');
-                }
+        function renderSuppliers() {
+            const container = document.getElementById('suppliers-list');
+            container.innerHTML = '';
+            suppliers.forEach(s => {
+                // Calculate due for this supplier
+                const suppInvoices = invoices.filter(i => i.supplierId === s.id);
+                const due = suppInvoices.filter(i => i.status === 'unpaid').reduce((sum, i) => sum + i.totalAmount, 0);
+                
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border flex justify-between items-center shadow-sm">
+                        <div>
+                            <h4 class="font-bold text-gray-800">${s.name}</h4>
+                            <p class="text-xs text-gray-500">${s.phone || '-'} | ${s.email || '-'}</p>
+                            <p class="text-xs text-gray-400 mt-1">Bank: ${s.bank || 'غير مسجل'}</p>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs text-gray-500">المستحق</p>
+                            <p class="font-bold ${due > 0 ? 'text-red-600' : 'text-green-600'}">${due.toFixed(3)} ر.ع</p>
+                            <button onclick="deleteSupplier(${s.id})" class="text-red-400 text-xs mt-2 hover:underline">حذف</button>
+                        </div>
+                    </div>
+                `;
             });
+        }
 
-            // Refresh data for the view
-            if(tabId === 'dashboard') updateDashboard();
-            if(tabId === 'suppliers') renderSuppliersList();
-            if(tabId === 'reports') updateReport();
-            if(tabId === 'users') renderUsersTable();
+        function populateSupplierSelect() {
+            const sel = document.getElementById('inv-supplier');
+            const repSel = document.getElementById('report-filter');
             
-            // Re-initialize icons
-            lucide.createIcons();
+            // Keep first option
+            sel.innerHTML = '<option value="">اختر المورد...</option>';
+            repSel.innerHTML = '<option value="all">الكل</option>';
+
+            suppliers.forEach(s => {
+                sel.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+                repSel.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
         }
 
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-        }
+        // --- Dashboard & Reports ---
+        function renderDashboard() {
+            const total = invoices.reduce((sum, i) => sum + i.totalAmount, 0);
+            const paid = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.totalAmount, 0);
+            const due = total - paid;
 
-        function calculateTotal() {
-            const qty = parseFloat(document.getElementById('inv-qty').value) || 0;
-            const price = parseFloat(document.getElementById('inv-price').value) || 0;
-            document.getElementById('inv-total-display').textContent = (qty * price).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-        }
-
-        function updateDashboard() {
-            const totalInvoices = invoices.reduce((sum, inv) => sum + (inv.quantity * inv.price), 0);
-            const totalPaid = invoices.filter(i => i.status === 'paid').reduce((sum, inv) => sum + (inv.quantity * inv.price), 0);
-            const totalDue = totalInvoices - totalPaid;
-
-            document.getElementById('dash-total').textContent = totalInvoices.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-            document.getElementById('dash-paid').textContent = totalPaid.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-            document.getElementById('dash-due').textContent = totalDue.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-            document.getElementById('header-total-due').textContent = formatCurrency(totalDue);
+            document.getElementById('dash-total').textContent = total.toFixed(3);
+            document.getElementById('dash-paid').textContent = paid.toFixed(3);
+            document.getElementById('dash-due').textContent = due.toFixed(3);
+            document.getElementById('header-total-due').textContent = due.toFixed(3) + ' ر.ع';
 
             const tbody = document.getElementById('dash-table-body');
             tbody.innerHTML = '';
-            
-            const sortedInvoices = [...invoices].sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            if (sortedInvoices.length === 0) {
-                document.getElementById('dash-empty-msg').classList.remove('hidden');
-            } else {
-                document.getElementById('dash-empty-msg').classList.add('hidden');
-                sortedInvoices.forEach(inv => {
-                    const supplier = suppliers.find(s => s.id === inv.supplierId);
-                    const days = getDaysRemaining(inv.dueDate);
-                    const total = inv.quantity * inv.price;
-                    
-                    let statusHtml = '';
-                    if (inv.status === 'paid') {
-                        statusHtml = `<span class="flex items-center gap-1 text-green-700 bg-green-100 px-2 py-1 rounded-full text-xs w-fit"><i data-lucide="check-circle" class="w-3 h-3"></i> مدفوع</span>`;
-                    } else if (days < 0) {
-                        statusHtml = `<span class="flex items-center gap-1 text-red-700 bg-red-100 px-2 py-1 rounded-full text-xs font-bold w-fit animate-pulse"><i data-lucide="alert-triangle" class="w-3 h-3"></i> متأخر ${Math.abs(days)} يوم</span>`;
-                    } else if (days === 0) {
-                        statusHtml = `<span class="flex items-center gap-1 text-orange-700 bg-orange-100 px-2 py-1 rounded-full text-xs font-bold w-fit"><i data-lucide="clock" class="w-3 h-3"></i> مستحق اليوم</span>`;
-                    } else {
-                        statusHtml = `<span class="flex items-center gap-1 text-blue-700 bg-blue-100 px-2 py-1 rounded-full text-xs font-bold w-fit"><i data-lucide="clock" class="w-3 h-3"></i> باقي ${days} يوم</span>`;
-                    }
-
-                    const row = `
-                        <tr class="hover:bg-gray-50 border-b border-gray-100 last:border-0">
-                            <td class="p-4 text-gray-600">${inv.date}</td>
-                            <td class="p-4 font-medium">${supplier ? supplier.name : 'مورد محذوف'}</td>
-                            <td class="p-4">${inv.item}</td>
-                            <td class="p-4 font-bold">${formatCurrency(total)}</td>
-                            <td class="p-4 text-gray-600">${inv.dueDate}</td>
-                            <td class="p-4">${statusHtml}</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-            }
+            // Show last 5 invoices
+            invoices.slice().reverse().slice(0, 5).forEach(inv => {
+                const sup = suppliers.find(s => s.id === inv.supplierId)?.name || 'مجهول';
+                const statusHtml = inv.status === 'paid' 
+                    ? '<span class="text-green-600 bg-green-50 px-2 py-1 rounded text-xs font-bold">مدفوع</span>' 
+                    : '<span class="text-red-600 bg-red-50 px-2 py-1 rounded text-xs font-bold">مستحق</span>';
+                
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-3">${inv.invoiceNumber}</td>
+                        <td class="p-3">${sup}</td>
+                        <td class="p-3">${inv.date}</td>
+                        <td class="p-3">${inv.dueDate}</td>
+                        <td class="p-3 font-bold">${inv.totalAmount.toFixed(3)}</td>
+                        <td class="p-3">${statusHtml}</td>
+                    </tr>
+                `;
+            });
         }
 
-        function renderSuppliersList() {
-            const container = document.getElementById('suppliers-list');
+        function renderReports() {
+            const container = document.getElementById('reports-container');
             container.innerHTML = '';
+            const filterId = document.getElementById('report-filter').value;
             
-            if (suppliers.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-center py-10">لا يوجد موردين مضافين</p>';
+            let filteredInvoices = invoices;
+            if(filterId !== 'all') {
+                filteredInvoices = invoices.filter(i => i.supplierId == filterId);
+            }
+
+            if(filteredInvoices.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400">لا توجد بيانات</p>';
                 return;
             }
 
-            suppliers.forEach(supplier => {
-                const supplierInvoices = invoices.filter(i => i.supplierId === supplier.id);
-                const due = supplierInvoices.filter(i => i.status === 'unpaid')
-                              .reduce((sum, i) => sum + (i.price * i.quantity), 0);
+            filteredInvoices.slice().reverse().forEach(inv => {
+                const sup = suppliers.find(s => s.id === inv.supplierId)?.name || 'مورد محذوف';
+                const statusColor = inv.status === 'paid' ? 'green' : 'red';
+                const statusText = inv.status === 'paid' ? 'مدفوع' : 'مستحق للدفع';
+                
+                // Calculate days remaining
+                const today = new Date();
+                const due = new Date(inv.dueDate);
+                const diffTime = due - today;
+                const daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                let daysText = '';
+                if(inv.status !== 'paid') {
+                    if(daysDiff < 0) daysText = `<span class="text-red-600 font-bold ml-2">(متأخر ${Math.abs(daysDiff)} يوم)</span>`;
+                    else daysText = `<span class="text-blue-600 ml-2">(باقي ${daysDiff} يوم)</span>`;
+                }
+
+                // Build Items Table for this invoice
+                let itemsRows = '';
+                inv.items.forEach(item => {
+                    const foc = item.isFoc ? '<span class="bg-purple-100 text-purple-800 text-[10px] px-1 rounded">مجاني</span>' : '';
+                    itemsRows += `
+                        <tr class="border-b text-xs text-gray-600">
+                            <td class="p-2">${item.name} ${foc}</td>
+                            <td class="p-2 text-center">${item.uom}</td>
+                            <td class="p-2 text-center">${item.expiry}</td>
+                            <td class="p-2 text-center">${item.qty}</td>
+                            <td class="p-2 text-center">${item.price.toFixed(3)}</td>
+                            <td class="p-2 text-center font-bold">${item.total.toFixed(3)}</td>
+                        </tr>
+                    `;
+                });
 
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col sm:flex-row justify-between items-center gap-4 hover:shadow-md transition-shadow">
-                        <div class="flex items-center gap-4 w-full sm:w-auto">
-                            <div class="bg-gray-100 p-3 rounded-full text-gray-600">
-                                <i data-lucide="users" class="w-6 h-6"></i>
-                            </div>
+                    <div class="bg-white border rounded-xl overflow-hidden print-break-inside">
+                        <div class="bg-gray-50 p-4 border-b flex justify-between items-start">
                             <div>
-                                <h4 class="font-bold text-lg text-gray-800">${supplier.name}</h4>
-                                <p class="text-gray-500 text-sm">${supplier.phone || 'لا يوجد هاتف'}</p>
+                                <h3 class="font-bold text-lg text-gray-800">فاتورة رقم: ${inv.invoiceNumber}</h3>
+                                <p class="text-sm text-gray-500">المورد: <span class="font-bold text-gray-700">${sup}</span></p>
+                                <p class="text-xs text-gray-400 mt-1">تاريخ: ${inv.date} | استحقاق: ${inv.dueDate} ${daysText}</p>
+                            </div>
+                            <div class="text-left">
+                                <span class="block text-2xl font-bold text-gray-800">${inv.totalAmount.toFixed(3)} ر.ع</span>
+                                <span class="inline-block mt-1 px-2 py-1 rounded text-xs font-bold text-${statusColor}-700 bg-${statusColor}-100 border border-${statusColor}-200 cursor-pointer" onclick="toggleStatus(${inv.id})">${statusText}</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
-                            <div class="text-left">
-                                <span class="block text-xs text-gray-500">مستحقات</span>
-                                <span class="block font-bold ${due > 0 ? 'text-red-600' : 'text-green-600'}">${formatCurrency(due)}</span>
-                            </div>
-                            <button onclick="deleteSupplier(${supplier.id})" class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors" title="حذف المورد">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
+                        <div class="p-4">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-50 text-xs text-gray-500">
+                                    <tr><th class="p-2">الصنف</th><th class="p-2 text-center">UOM</th><th class="p-2 text-center">Exp</th><th class="p-2 text-center">الكمية</th><th class="p-2 text-center">السعر</th><th class="p-2 text-center">الإجمالي</th></tr>
+                                </thead>
+                                <tbody>${itemsRows}</tbody>
+                            </table>
                         </div>
                     </div>
                 `;
                 container.innerHTML += card;
             });
-            lucide.createIcons();
         }
 
-        function populateSupplierSelects() {
-            const selects = [document.getElementById('inv-supplier'), document.getElementById('report-supplier-filter')];
-            const hasSuppliers = suppliers.length > 0;
-
-            document.getElementById('no-suppliers-msg').classList.toggle('hidden', hasSuppliers);
-
-            // Invoice Select
-            const invSelect = document.getElementById('inv-supplier');
-            invSelect.innerHTML = '<option value="">-- اختر من القائمة --</option>';
-            suppliers.forEach(s => {
-                invSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
-            });
-
-            // Report Select (Keep the first 'all' option)
-            const repSelect = document.getElementById('report-supplier-filter');
-            const currentVal = repSelect.value;
-            repSelect.innerHTML = '<option value="all">جميع الموردين</option>';
-            suppliers.forEach(s => {
-                repSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
-            });
-            repSelect.value = currentVal;
-        }
-
-        function updateReport() {
-            const filterId = document.getElementById('report-supplier-filter').value;
-            const reportDate = new Date().toLocaleDateString('ar-SA');
-            document.getElementById('report-date').textContent = reportDate;
-
-            let filteredInvoices = invoices;
-            if (filterId !== 'all') {
-                filteredInvoices = invoices.filter(inv => inv.supplierId == filterId);
-                const sup = suppliers.find(s => s.id == filterId);
-                document.getElementById('report-supplier-name').textContent = sup ? sup.name : '';
-                document.getElementById('report-header-filter').classList.remove('hidden');
-                // Hide supplier column in print if specific supplier selected
-                document.querySelectorAll('.filter-col').forEach(el => el.classList.add('hidden'));
-            } else {
-                document.getElementById('report-header-filter').classList.add('hidden');
-                document.querySelectorAll('.filter-col').forEach(el => el.classList.remove('hidden'));
-            }
-
-            const totalSum = filteredInvoices.reduce((sum, inv) => sum + (inv.quantity * inv.price), 0);
-            const dueSum = filteredInvoices.filter(i => i.status === 'unpaid').reduce((sum, inv) => sum + (inv.quantity * inv.price), 0);
-
-            document.getElementById('report-total-sum').textContent = totalSum.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-            document.getElementById('report-due-sum').textContent = dueSum.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-            document.getElementById('report-footer-total').textContent = totalSum.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-
-            const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '';
-
-            if(filteredInvoices.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">لا توجد بيانات للعرض</td></tr>';
-            } else {
-                filteredInvoices.forEach(inv => {
-                    const supplier = suppliers.find(s => s.id === inv.supplierId);
-                    const total = inv.quantity * inv.price;
-                    const days = getDaysRemaining(inv.dueDate);
-                    const statusClass = inv.status === 'paid' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
-                    const statusText = inv.status === 'paid' ? 'تم الدفع' : 'مستحق';
-                    
-                    let timeRemainingHtml = '';
-                    if (inv.status === 'paid') {
-                        timeRemainingHtml = '<span class="text-gray-400">-</span>';
-                    } else {
-                        if (days < 0) {
-                            timeRemainingHtml = `<span class="text-red-600 font-bold text-xs">متأخر ${Math.abs(days)} يوم</span>`;
-                        } else if (days === 0) {
-                            timeRemainingHtml = `<span class="text-orange-600 font-bold text-xs">اليوم</span>`;
-                        } else {
-                            timeRemainingHtml = `<span class="text-blue-600 text-xs">باقي ${days} يوم</span>`;
-                        }
-                    }
-
-                    const row = `
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-3 px-2">${inv.date}</td>
-                            ${filterId === 'all' ? `<td class="py-3 px-2 font-medium filter-col">${supplier ? supplier.name : 'محذوف'}</td>` : ''}
-                            <td class="py-3 px-2">${inv.item}</td>
-                            <td class="py-3 px-2 text-center">${inv.quantity}</td>
-                            <td class="py-3 px-2 font-bold">${total.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</td>
-                            <td class="py-3 px-2 text-gray-600">${inv.dueDate}</td>
-                            <td class="py-3 px-2 text-center">${timeRemainingHtml}</td>
-                            <td class="py-3 px-2 text-center">
-                                <span class="inline-block px-2 py-1 rounded text-xs border ${statusClass}">${statusText}</span>
-                            </td>
-                            <td class="py-3 px-2 text-center no-print">
-                                <button onclick="toggleInvoiceStatus(${inv.id})" class="p-1 rounded hover:bg-gray-100 text-sm ${inv.status === 'paid' ? 'text-red-500' : 'text-green-500'}">
-                                    <i data-lucide="${inv.status === 'paid' ? 'x-circle' : 'check-circle'}" class="w-5 h-5"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-            }
-            lucide.createIcons();
-        }
-
-        // --- Event Listeners & Logic ---
-
-        document.getElementById('supplier-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('sup-name').value;
-            const phone = document.getElementById('sup-phone').value;
-            
-            const id = suppliers.length > 0 ? Math.max(...suppliers.map(s => s.id)) + 1 : 1;
-            suppliers.push({ id, name, phone });
-            
-            e.target.reset();
-            saveData();
-            alert('تم إضافة المورد بنجاح');
-            renderSuppliersList(); // Re-render if on suppliers tab
-        });
-
-        document.getElementById('invoice-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const supplierId = parseInt(document.getElementById('inv-supplier').value);
-            const item = document.getElementById('inv-item').value;
-            const quantity = parseFloat(document.getElementById('inv-qty').value);
-            const price = parseFloat(document.getElementById('inv-price').value);
-            const date = document.getElementById('inv-date').value;
-            const dueDate = document.getElementById('inv-due-date').value;
-            const status = document.querySelector('input[name="inv-status"]:checked').value;
-
-            if(!supplierId) { alert('الرجاء اختيار مورد'); return; }
-
-            const id = invoices.length > 0 ? Math.max(...invoices.map(i => i.id)) + 1 : 101;
-            invoices.push({ id, supplierId, item, quantity, price, date, dueDate, status });
-
-            // Reset form partly
-            document.getElementById('inv-item').value = '';
-            document.getElementById('inv-qty').value = '1';
-            document.getElementById('inv-price').value = '0';
-            calculateTotal();
-            
-            saveData();
-            alert('تم حفظ الفاتورة بنجاح');
-        });
-
-        window.deleteSupplier = (id) => {
-            const hasInvoices = invoices.some(inv => inv.supplierId === id);
-            
-            let confirmMessage = 'هل أنت متأكد من حذف هذا المورد؟';
-            if (hasInvoices) {
-                confirmMessage = 'تنبيه: هذا المورد لديه فواتير مسجلة. سيتم حذف المورد وجميع فواتيره المرتبطة. هل أنت متأكد؟';
-            }
-
-            if(confirm(confirmMessage)) {
-                // Delete associated invoices first if any
-                if (hasInvoices) {
-                    invoices = invoices.filter(inv => inv.supplierId !== id);
-                }
-                // Delete supplier
-                suppliers = suppliers.filter(s => s.id !== id);
-                saveData();
-                alert('تم الحذف بنجاح');
-            }
-        };
-
-        window.toggleInvoiceStatus = (id) => {
+        function toggleStatus(id) {
             const inv = invoices.find(i => i.id === id);
             if(inv) {
                 inv.status = inv.status === 'paid' ? 'unpaid' : 'paid';
-                saveData();
-                updateReport(); // Refresh report if active
-                updateDashboard(); // Refresh dashboard data
+                localStorage.setItem('billing_invoices_v2', JSON.stringify(invoices));
+                renderAll();
             }
-        };
-
-        window.exportData = () => {
-            const data = {
-                suppliers,
-                invoices,
-                users, // Export users too
-                exportDate: new Date().toISOString(),
-                appVersion: "2.0-html"
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `billing_backup_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
-
-        window.importData = (input) => {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.suppliers && data.invoices) {
-                        if (confirm('سيتم استبدال البيانات الحالية بالبيانات الموجودة في الملف. هل أنت متأكد؟')) {
-                            suppliers = data.suppliers;
-                            invoices = data.invoices;
-                            if(data.users) users = data.users; // Import users if exist
-                            saveData();
-                            alert('تم استرجاع قاعدة البيانات بنجاح!');
-                        }
-                    } else {
-                        alert('الملف غير صالح.');
-                    }
-                } catch (error) {
-                    alert('خطأ في قراءة الملف.');
-                }
-            };
-            reader.readAsText(file);
-            input.value = ''; // Reset
-        };
-
-        window.resetData = () => {
-            if (confirm('تحذير: سيتم حذف جميع البيانات والعودة للوضع الافتراضي. هل أنت متأكد؟')) {
-                suppliers = defaultSuppliers;
-                invoices = defaultInvoices;
-                users = defaultUsers; // Reset users too
-                saveData();
-                location.reload();
-            }
-        };
-
-        function renderAll() {
-            populateSupplierSelects();
-            updateDashboard();
-            renderSuppliersList();
-            updateReport();
         }
 
-        // --- Initialization ---
-        document.getElementById('inv-date').valueAsDate = new Date();
-        document.getElementById('inv-due-date').value = getDefaultDueDate();
-        
-        // Initial Render
-        renderAll();
-        lucide.createIcons();
+        // --- User Management ---
+        function renderUsers() {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+            users.forEach(u => {
+                const statusColor = u.active ? 'green' : 'red';
+                const toggleIcon = u.active ? 'unlock' : 'lock';
+                
+                // Prevent editing main admin (id 1)
+                const isProtected = u.id === 1;
+                const actions = isProtected ? '<span class="text-xs text-gray-400">محمي</span>' : `
+                    <button onclick="toggleUser(${u.id})" class="text-${statusColor}-600 p-1"><i data-lucide="${toggleIcon}" class="w-4 h-4"></i></button>
+                    <button onclick="deleteUser(${u.id})" class="text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
 
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border">
+                        <div>
+                            <span class="font-bold text-sm block">${u.name}</span>
+                            <span class="text-xs text-gray-500">الرمز: ${u.password} | ${u.role === 'admin' ? 'مدير' : 'مستخدم'}</span>
+                        </div>
+                        <div class="flex gap-2">${actions}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function addUser() {
+            const name = document.getElementById('new-user-name').value;
+            const pass = document.getElementById('new-user-pass').value;
+            const role = document.getElementById('new-user-role').value;
+            
+            if(!name || !pass) return alert("أكمل البيانات");
+            if(users.some(u => u.password === pass)) return alert("الرمز مستخدم");
+
+            users.push({ id: Date.now(), name, password: pass, role, active: true });
+            localStorage.setItem('billing_users', JSON.stringify(users));
+            renderUsers();
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+        }
+
+        function toggleUser(id) {
+            const u = users.find(x => x.id === id);
+            if(u) { u.active = !u.active; localStorage.setItem('billing_users', JSON.stringify(users)); renderUsers(); }
+        }
+        
+        function deleteUser(id) {
+            if(confirm("حذف المستخدم؟")) {
+                users = users.filter(x => x.id !== id);
+                localStorage.setItem('billing_users', JSON.stringify(users));
+                renderUsers();
+            }
+        }
+
+        // --- Common ---
+        function switchTab(tab) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            renderAll();
+        }
+
+        function renderAll() {
+            if(!currentUser) return;
+            renderDashboard();
+            renderSuppliers();
+            populateSupplierSelect();
+            renderReports();
+            if(currentUser.role === 'admin') renderUsers();
+            lucide.createIcons();
+        }
+
+        // --- Settings ---
+        function resetData() {
+            if(confirm("تحذير: سيتم حذف جميع الفواتير والموردين!")) {
+                localStorage.removeItem('billing_invoices_v2');
+                localStorage.removeItem('billing_suppliers');
+                location.reload();
+            }
+        }
+        
+        // Setup Date
+        document.getElementById('inv-date').valueAsDate = new Date();
+        document.getElementById('inv-due-date').valueAsDate = new Date(new Date().setDate(new Date().getDate() + 30));
+
+        // Initial Logic
+        lucide.createIcons();
     </script>
 </body>
 </html>
