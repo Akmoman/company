@@ -34,19 +34,23 @@
             <div class="bg-blue-600 p-4 rounded-full w-fit mx-auto mb-6 shadow-lg">
                 <i data-lucide="lock" class="text-white w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">النظام مقفل</h2>
-            <p class="text-gray-500 mb-6 text-sm">الرجاء إدخال رمز المرور للوصول إلى البيانات</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">تسجيل الدخول</h2>
+            <p class="text-gray-500 mb-6 text-sm">أدخل رمز المرور الخاص بك للدخول</p>
             
-            <form id="login-form" class="space-y-4">
-                <input type="password" id="login-password" placeholder="أدخل الرمز هنا" class="w-full p-3 border border-gray-300 rounded-lg text-center text-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" autofocus>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md">دخول للنظام</button>
+            <form id="login-form" class="space-y-6">
+                <!-- Username field removed -->
+                <div class="text-right">
+                    <label class="text-xs text-gray-500 font-bold mb-1 block">رمز المرور / كلمة السر</label>
+                    <input type="password" id="login-password" placeholder="أدخل الرمز هنا" class="w-full p-4 border border-gray-300 rounded-lg text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none transition-all" required autofocus>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors shadow-md text-lg">دخول</button>
             </form>
             <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden flex items-center justify-center gap-1">
                 <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                رمز المرور غير صحيح
+                <span id="login-error-text">رمز المرور غير صحيح</span>
             </p>
         </div>
-        <p class="text-gray-500 text-xs mt-4">نظام فوترة الموردين الآمن v1.0</p>
+        <p class="text-gray-500 text-xs mt-4">نظام فوترة الموردين v2.1</p>
     </div>
 
     <!-- Header -->
@@ -57,18 +61,27 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-gray-800">نظام فوترة الموردين</h1>
-                <p class="text-xs text-gray-500" id="header-subtitle">إدارة المدفوعات والسلع</p>
+                <div class="flex items-center gap-2">
+                    <p class="text-xs text-gray-500" id="header-subtitle">إدارة المدفوعات والسلع</p>
+                    <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600 font-bold" id="current-user-display"></span>
+                </div>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <div class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+            <div class="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full hidden sm:flex">
                 <i data-lucide="save" class="w-3 h-3"></i>
-                <span>حفظ تلقائي مفعل</span>
+                <span>حفظ تلقائي</span>
             </div>
             <div class="text-left hidden sm:block border-r border-gray-200 pr-4 mr-4">
                 <p class="text-sm text-gray-500">إجمالي المستحق للدفع</p>
                 <p class="text-lg font-bold text-red-600" id="header-total-due">0.000 ر.ع</p>
             </div>
+            
+            <button onclick="logout()" class="p-2 text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors" title="تسجيل الخروج">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                <span class="hidden sm:inline text-sm font-bold">خروج</span>
+            </button>
+
             <!-- Mobile Menu Button -->
             <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-600">
                 <i data-lucide="menu" class="w-6 h-6"></i>
@@ -96,11 +109,18 @@
                 <i data-lucide="printer" class="w-5 h-5"></i>
                 <span>التقارير الشاملة</span>
             </button>
-            <div class="border-t my-2 border-gray-100"></div>
-            <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="settings">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                <span>إدارة البيانات</span>
-            </button>
+            
+            <div id="admin-menu-items" class="hidden">
+                <div class="border-t my-2 border-gray-100"></div>
+                <button onclick="switchTab('users')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="users">
+                    <i data-lucide="user-cog" class="w-5 h-5"></i>
+                    <span>إدارة المستخدمين</span>
+                </button>
+                <button onclick="switchTab('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50" data-tab="settings">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>إدارة البيانات</span>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -326,6 +346,64 @@
                 </div>
             </div>
 
+            <!-- VIEW: USER MANAGEMENT (Admin Only) -->
+            <div id="view-users" class="view-section hidden space-y-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <i data-lucide="user-cog" class="text-blue-600 w-6 h-6"></i>
+                    إدارة المستخدمين
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Add User Form -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit md:col-span-1">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                            <i data-lucide="plus-circle" class="text-blue-600 w-5 h-5"></i>
+                            إضافة مستخدم جديد
+                        </h3>
+                        <form id="add-user-form" class="space-y-4">
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">الاسم الكامل</label>
+                                <input type="text" id="new-user-fullname" required class="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="مثال: علي محمد">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">رمز المرور</label>
+                                <input type="text" id="new-user-password" required class="w-full p-2 border border-gray-300 rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="مثال: 1234">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 font-bold">الصلاحية</label>
+                                <select id="new-user-role" class="w-full p-2 border border-gray-300 rounded mt-1 bg-white">
+                                    <option value="user">مستخدم عادي (فواتير فقط)</option>
+                                    <option value="admin">مدير (صلاحيات كاملة)</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-700 py-2 rounded-lg font-medium">حفظ المستخدم</button>
+                        </form>
+                    </div>
+
+                    <!-- Users List -->
+                    <div class="md:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 bg-gray-50">
+                            <h3 class="font-bold text-gray-700">قائمة الحسابات المسجلة</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                                    <tr>
+                                        <th class="p-4">الاسم الكامل</th>
+                                        <th class="p-4">الصلاحية</th>
+                                        <th class="p-4">الحالة</th>
+                                        <th class="p-4 text-center">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body" class="divide-y divide-gray-100">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- VIEW: SETTINGS -->
             <div id="view-settings" class="view-section hidden max-w-2xl mx-auto space-y-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -340,7 +418,7 @@
                             تصدير نسخة احتياطية
                         </h3>
                         <p class="text-gray-500 text-sm mb-4">
-                            قم بتحميل ملف JSON يحتوي على جميع البيانات. استخدمه لاستعادة البيانات لاحقاً.
+                            قم بتحميل ملف JSON يحتوي على جميع البيانات (موردين، فواتير، ومستخدمين).
                         </p>
                         <button onclick="exportData()" class="w-full bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2">
                             <i data-lucide="download" class="w-4 h-4"></i>
@@ -386,23 +464,169 @@
 
     <!-- Application Logic -->
     <script>
-        // --- Login Logic ---
+        // --- Users & Auth Logic ---
+        
+        // Default Admin User (Password Only)
+        const defaultUsers = [
+            { id: 1, password: 'akm1983', role: 'admin', name: 'المدير العام', active: true }
+        ];
+
+        // Load users from storage
+        let users = JSON.parse(localStorage.getItem('billing_users')) || defaultUsers;
+        
+        // Data Migration fix: If old format users (with username) exist, keep them but ensure 'active' flag exists
+        if(users.length > 0 && typeof users[0].active === 'undefined') {
+            users = users.map(u => ({...u, active: true}));
+            localStorage.setItem('billing_users', JSON.stringify(users));
+        }
+
+        let currentUser = null;
+
+        // Login Form Handler
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const pass = document.getElementById('login-password').value;
-            if (pass === '2040') {
+            const passIn = document.getElementById('login-password').value.trim();
+            
+            // Find user by password only
+            const foundUser = users.find(u => u.password === passIn);
+
+            const errorText = document.getElementById('login-error-text');
+            const errorDiv = document.getElementById('login-error');
+
+            if (foundUser) {
+                if (foundUser.active === false) {
+                    errorText.textContent = 'تم تعطيل هذا الحساب. راجع المدير.';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+
+                currentUser = foundUser;
                 document.getElementById('login-screen').classList.add('hidden');
-                // Refresh icons after unlocking to ensure they render if any issues
+                document.getElementById('current-user-display').textContent = foundUser.name;
+                
+                // Show/Hide Admin menus based on role
+                if (currentUser.role === 'admin') {
+                    document.getElementById('admin-menu-items').classList.remove('hidden');
+                } else {
+                    document.getElementById('admin-menu-items').classList.add('hidden');
+                }
+
                 lucide.createIcons();
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                
+                if(currentUser.role !== 'admin') {
+                    switchTab('dashboard');
+                } else {
+                    renderUsersTable();
+                }
+
+                // Reset Login Form
                 document.getElementById('login-password').value = '';
-                document.getElementById('login-password').focus();
+                errorDiv.classList.add('hidden');
+
+            } else {
+                errorText.textContent = 'رمز المرور غير صحيح';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('login-password').value = '';
             }
         });
 
-        // --- Data Initialization ---
-        // تم إفراغ البيانات الافتراضية بناءً على طلب المستخدم
+        function logout() {
+            currentUser = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+            switchTab('dashboard'); 
+        }
+
+        // Add User Handler
+        document.getElementById('add-user-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('new-user-fullname').value.trim();
+            const password = document.getElementById('new-user-password').value.trim();
+            const role = document.getElementById('new-user-role').value;
+
+            // Check if password already exists (since it's the unique key now)
+            if (users.some(u => u.password === password)) {
+                alert('رمز المرور هذا مستخدم بالفعل، الرجاء اختيار رمز آخر.');
+                return;
+            }
+
+            const id = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+            users.push({ id, password, name, role, active: true });
+            saveData();
+            
+            // Reset form
+            document.getElementById('new-user-fullname').value = '';
+            document.getElementById('new-user-password').value = '';
+            
+            renderUsersTable();
+            alert('تم إضافة المستخدم بنجاح');
+        });
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const roleBadge = user.role === 'admin' 
+                    ? '<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">مدير</span>' 
+                    : '<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">مستخدم</span>';
+                
+                const statusBadge = user.active 
+                    ? '<span class="text-green-600 font-bold text-xs">نشط</span>'
+                    : '<span class="text-red-600 font-bold text-xs">معطل</span>';
+
+                let actionBtns = '';
+                
+                // Protect Main Admin (ID 1)
+                if (user.id === 1) {
+                    actionBtns = '<span class="text-gray-300 text-xs italic">محمي</span>';
+                } else {
+                    const toggleIcon = user.active ? 'lock' : 'unlock';
+                    const toggleColor = user.active ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50';
+                    const toggleTitle = user.active ? 'تعطيل الحساب' : 'تفعيل الحساب';
+
+                    actionBtns = `
+                        <div class="flex justify-center gap-2">
+                            <button onclick="toggleUserStatus(${user.id})" class="${toggleColor} p-1 rounded" title="${toggleTitle}">
+                                <i data-lucide="${toggleIcon}" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="deleteUser(${user.id})" class="text-red-500 hover:bg-red-50 p-1 rounded" title="حذف نهائي">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                const row = `
+                    <tr class="hover:bg-gray-50 border-b border-gray-100 last:border-0 ${!user.active ? 'bg-red-50' : ''}">
+                        <td class="p-4 font-medium text-gray-700">${user.name}</td>
+                        <td class="p-4">${roleBadge}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4 text-center">${actionBtns}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            lucide.createIcons();
+        }
+
+        window.deleteUser = (id) => {
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم نهائياً؟')) {
+                users = users.filter(u => u.id !== id);
+                saveData();
+                renderUsersTable();
+            }
+        };
+
+        window.toggleUserStatus = (id) => {
+            const user = users.find(u => u.id === id);
+            if(user) {
+                user.active = !user.active;
+                saveData();
+                renderUsersTable();
+            }
+        };
+
+        // --- Data Initialization (Existing) ---
         const defaultSuppliers = [];
         const defaultInvoices = [];
 
@@ -413,6 +637,7 @@
         const saveData = () => {
             localStorage.setItem('billing_suppliers', JSON.stringify(suppliers));
             localStorage.setItem('billing_invoices', JSON.stringify(invoices));
+            localStorage.setItem('billing_users', JSON.stringify(users)); // Save Users too
             renderAll();
         };
 
@@ -455,6 +680,7 @@
             if(tabId === 'dashboard') updateDashboard();
             if(tabId === 'suppliers') renderSuppliersList();
             if(tabId === 'reports') updateReport();
+            if(tabId === 'users') renderUsersTable();
             
             // Re-initialize icons
             lucide.createIcons();
@@ -736,8 +962,9 @@
             const data = {
                 suppliers,
                 invoices,
+                users, // Export users too
                 exportDate: new Date().toISOString(),
-                appVersion: "1.0-html"
+                appVersion: "2.0-html"
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -761,6 +988,7 @@
                         if (confirm('سيتم استبدال البيانات الحالية بالبيانات الموجودة في الملف. هل أنت متأكد؟')) {
                             suppliers = data.suppliers;
                             invoices = data.invoices;
+                            if(data.users) users = data.users; // Import users if exist
                             saveData();
                             alert('تم استرجاع قاعدة البيانات بنجاح!');
                         }
@@ -779,6 +1007,7 @@
             if (confirm('تحذير: سيتم حذف جميع البيانات والعودة للوضع الافتراضي. هل أنت متأكد؟')) {
                 suppliers = defaultSuppliers;
                 invoices = defaultInvoices;
+                users = defaultUsers; // Reset users too
                 saveData();
                 location.reload();
             }
