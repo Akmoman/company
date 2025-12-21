@@ -29,6 +29,24 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Dropdown Menu Styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 50;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -94,7 +112,7 @@
             </form>
             <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden">رمز المرور غير صحيح</p>
         </div>
-        <p class="text-gray-500 text-xs mt-4">V4.1 - Fixed Aging Calculation</p>
+        <p class="text-gray-500 text-xs mt-4">V4.5 - Bank Details Added</p>
     </div>
 
     <!-- Header -->
@@ -296,40 +314,55 @@
             <!-- VIEW: PAYMENTS LOG -->
             <div id="view-payments" class="view-section hidden space-y-6">
                 <div class="flex justify-between items-center no-print">
-                    <h2 class="text-2xl font-bold flex gap-2 text-gray-800"><i data-lucide="wallet" class="text-blue-600"></i>سجل المدفوعات اليدوية</h2>
-                    <button onclick="window.print()" class="px-4 py-2 border rounded hover:bg-gray-50 flex gap-2"><i data-lucide="printer"></i>طباعة</button>
+                    <h2 class="text-2xl font-bold flex gap-2 text-gray-800"><i data-lucide="wallet" class="text-blue-600"></i>سجل المدفوعات الشهرية</h2>
+                    <div class="flex gap-2">
+                        <select id="payments-year-filter" class="p-2 border rounded bg-white text-sm" onchange="renderPayments()"></select>
+                        <button onclick="window.print()" class="px-4 py-2 border rounded hover:bg-gray-50 flex gap-2"><i data-lucide="printer"></i>طباعة</button>
+                    </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <table class="w-full text-right text-sm">
-                        <thead class="bg-gray-50 text-gray-600">
-                            <tr>
-                                <th class="p-3">تاريخ الدفع</th>
-                                <th class="p-3">الفاتورة</th>
-                                <th class="p-3">المورد</th>
-                                <th class="p-3">طريقة الدفع</th>
-                                <th class="p-3">المبلغ</th>
-                                <th class="p-3">ملاحظات</th>
-                                <th class="p-3 text-center no-print">إلغاء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="payments-history-body" class="divide-y divide-gray-100"></tbody>
-                    </table>
-                </div>
+
+                <div id="payments-content"></div>
             </div>
 
             <!-- VIEW: REPORTS -->
             <div id="view-reports" class="view-section hidden space-y-6">
                 <div class="flex justify-between items-center no-print">
                     <h2 class="text-2xl font-bold flex gap-2"><i data-lucide="file-text" class="text-blue-600"></i>تقارير الفواتير</h2>
-                    <div class="flex gap-2">
-                        <select id="report-aging-filter" class="p-2 border rounded bg-white text-sm" onchange="renderReports()">
-                            <option value="all">كل الفترات</option>
-                            <option value="overdue">المتأخرة</option>
-                            <option value="0-30">0 - 30 يوم</option>
-                            <option value="31-60">31 - 60 يوم</option>
-                            <option value="61-90">61 - 90 يوم</option>
-                        </select>
-                        <select id="report-filter" class="p-2 border rounded bg-white text-sm" onchange="renderReports()"><option value="all">جميع الموردين</option></select>
+                    <div class="flex gap-2 items-center">
+                        
+                        <!-- Multi-Select Dropdown Container -->
+                        <div class="relative inline-block text-left dropdown-container">
+                            <button onclick="toggleAgingMenu()" type="button" class="inline-flex justify-between items-center w-48 rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                <span>فترة الاستحقاق</span>
+                                <i data-lucide="chevron-down" class="ml-2 h-4 w-4"></i>
+                            </button>
+                            <div id="aging-menu" class="dropdown-menu">
+                                <div class="py-1 p-2 space-y-2 text-right">
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                        <input type="checkbox" class="aging-checkbox w-4 h-4 text-blue-600 rounded" value="overdue" checked onchange="renderReports()">
+                                        <span class="text-sm font-bold text-red-600">متأخرة (أقل من 0)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                        <input type="checkbox" class="aging-checkbox w-4 h-4 text-blue-600 rounded" value="0-30" checked onchange="renderReports()">
+                                        <span class="text-sm">0 - 30 يوم</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                        <input type="checkbox" class="aging-checkbox w-4 h-4 text-blue-600 rounded" value="31-60" checked onchange="renderReports()">
+                                        <span class="text-sm">31 - 60 يوم</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                        <input type="checkbox" class="aging-checkbox w-4 h-4 text-blue-600 rounded" value="61-90" checked onchange="renderReports()">
+                                        <span class="text-sm">61 - 90 يوم</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                                        <input type="checkbox" class="aging-checkbox w-4 h-4 text-blue-600 rounded" value="91+" checked onchange="renderReports()">
+                                        <span class="text-sm">أكثر من 90 يوم</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <select id="report-filter" class="p-2 border rounded bg-white text-sm w-48" onchange="renderReports()"><option value="all">جميع الموردين</option></select>
                         <button onclick="window.print()" class="px-4 py-2 border rounded hover:bg-gray-50 flex gap-2"><i data-lucide="printer"></i>طباعة</button>
                     </div>
                 </div>
@@ -495,40 +528,111 @@
             localStorage.setItem('billing_invoices_v2', JSON.stringify(invoices));
         }
 
-        function renderPaymentsHistory() {
-            const tbody = document.getElementById('payments-history-body');
-            tbody.innerHTML = '';
+        // --- NEW: MONTHLY PAYMENTS REPORT LOGIC ---
+        function populatePaymentsYearFilter() {
+            const yearSelect = document.getElementById('payments-year-filter');
+            yearSelect.innerHTML = '';
+            const years = [...new Set(paymentsList.map(p => new Date(p.date).getFullYear()))].sort().reverse();
             
-            if(paymentsList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-gray-400">لا توجد مدفوعات مسجلة</td></tr>';
+            if (years.length === 0) {
+                const currentYear = new Date().getFullYear();
+                yearSelect.innerHTML = `<option value="${currentYear}">${currentYear}</option>`;
+            } else {
+                years.forEach(year => {
+                    yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+                });
+            }
+        }
+
+        function renderPayments() {
+            const container = document.getElementById('payments-content');
+            container.innerHTML = '';
+            
+            const selectedYear = parseInt(document.getElementById('payments-year-filter').value);
+            const filteredPayments = paymentsList.filter(p => new Date(p.date).getFullYear() === selectedYear);
+
+            if (filteredPayments.length === 0) {
+                container.innerHTML = '<div class="text-center p-8 text-gray-400 bg-white rounded-xl border">لا توجد مدفوعات مسجلة لهذه السنة</div>';
                 return;
             }
 
-            // Sort by date desc
-            const sortedPayments = [...paymentsList].sort((a,b) => new Date(b.date) - new Date(a.date));
+            // Group by Month
+            const monthsData = {};
+            for (let i = 0; i < 12; i++) monthsData[i] = { total: 0, items: [] };
 
-            sortedPayments.forEach(pay => {
-                const inv = invoices.find(i => i.id === pay.invoiceId);
-                const invNum = inv ? inv.invoiceNumber : 'محذوفة';
-                const supId = inv ? inv.supplierId : null;
-                const sup = suppliers.find(s => s.id === supId)?.name || '-';
-                
-                const methods = { 'cash': 'نقد', 'bank': 'تحويل', 'cheque': 'شيك' };
-
-                tbody.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">${pay.date}</td>
-                        <td class="p-3 font-bold">${invNum}</td>
-                        <td class="p-3">${sup}</td>
-                        <td class="p-3 text-xs bg-gray-100 rounded text-center w-fit px-2 inline-block mt-2">${methods[pay.method]}</td>
-                        <td class="p-3 font-bold text-green-600">${formatCurrency(pay.amount)}</td>
-                        <td class="p-3 text-xs text-gray-500">${pay.notes || '-'}</td>
-                        <td class="p-3 text-center no-print">
-                            <button onclick="deletePayment(${pay.id})" class="text-red-500 hover:bg-red-50 p-1 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </td>
-                    </tr>
-                `;
+            filteredPayments.forEach(pay => {
+                const month = new Date(pay.date).getMonth(); // 0-11
+                monthsData[month].total += pay.amount;
+                monthsData[month].items.push(pay);
             });
+
+            // Arabic Months Names
+            const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+            // Render Summary Cards
+            let summaryHTML = '<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 print-break-inside">';
+            for(let i = 0; i < 12; i++) {
+                if (monthsData[i].total > 0) {
+                    summaryHTML += `
+                        <div class="bg-white p-4 rounded-xl border border-green-100 shadow-sm text-center">
+                            <p class="text-xs text-gray-500 mb-1">${monthNames[i]}</p>
+                            <p class="font-bold text-green-700 text-lg">${formatCurrency(monthsData[i].total)}</p>
+                            <p class="text-[10px] text-gray-400">${monthsData[i].items.length} حركات</p>
+                        </div>
+                    `;
+                }
+            }
+            summaryHTML += '</div>';
+
+            // Render Detailed Tables per month
+            let detailsHTML = '<div class="space-y-8">';
+            for(let i = 0; i < 12; i++) {
+                if (monthsData[i].items.length > 0) {
+                    let rows = '';
+                    monthsData[i].items.forEach(pay => {
+                        const inv = invoices.find(inv => inv.id === pay.invoiceId);
+                        const invNum = inv ? inv.invoiceNumber : 'محذوفة';
+                        const supId = inv ? inv.supplierId : null;
+                        const supObj = suppliers.find(s => s.id === supId);
+                        const supName = supObj?.name || '-';
+                        const supBank = supObj?.bank ? `<span class="text-[10px] text-gray-400 block">${supObj.bank}</span>` : '';
+
+                        rows += `
+                            <tr class="border-b">
+                                <td class="p-2">${invNum}</td>
+                                <td class="p-2">
+                                    <div>${supName}</div>
+                                    ${supBank}
+                                </td>
+                                <td class="p-2">${pay.date}</td>
+                                <td class="p-2 font-bold text-green-700">${formatCurrency(pay.amount)}</td>
+                                <td class="p-2 text-xs text-gray-500">${pay.method}</td>
+                            </tr>
+                        `;
+                    });
+
+                    detailsHTML += `
+                        <div class="bg-white border rounded-xl overflow-hidden print-break-inside">
+                            <div class="bg-gray-50 p-3 border-b flex justify-between items-center">
+                                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                    <span class="bg-green-100 text-green-700 w-6 h-6 flex items-center justify-center rounded-full text-xs">${i+1}</span>
+                                    مدفوعات شهر ${monthNames[i]}
+                                </h3>
+                                <span class="font-bold text-green-700">${formatCurrency(monthsData[i].total)}</span>
+                            </div>
+                            <table class="w-full text-right text-sm">
+                                <thead class="bg-gray-50 text-gray-500 text-xs">
+                                    <tr><th class="p-2">رقم الفاتورة</th><th class="p-2">المورد</th><th class="p-2">تاريخ الدفع</th><th class="p-2">المبلغ</th><th class="p-2">الطريقة</th></tr>
+                                </thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+            detailsHTML += '</div>';
+
+            container.innerHTML = summaryHTML + detailsHTML;
         }
 
         // --- Invoice Logic ---
@@ -760,33 +864,58 @@
             });
         }
 
-        // --- Reports ---
+        // --- Reports Logic with Multi-Select ---
+        function toggleAgingMenu() {
+            document.getElementById('aging-menu').classList.toggle('show');
+        }
+
+        // FIX: Improved click outside logic
+        window.onclick = function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+
         function renderReports() {
             const container = document.getElementById('reports-container');
             container.innerHTML = '';
             
             const filterId = document.getElementById('report-filter').value;
-            const agingFilter = document.getElementById('report-aging-filter').value;
+            
+            // Get checked aging filters
+            const agingCheckboxes = document.querySelectorAll('.aging-checkbox:checked');
+            const selectedAging = Array.from(agingCheckboxes).map(cb => cb.value);
             
             let filteredInvoices = invoices;
             
             if(filterId !== 'all') filteredInvoices = invoices.filter(i => i.supplierId == filterId);
 
-            if (agingFilter !== 'all') {
-                filteredInvoices = filteredInvoices.filter(inv => {
-                    const today = new Date();
-                    today.setHours(0,0,0,0);
-                    const due = new Date(inv.dueDate);
-                    const diffTime = due - today;
-                    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            filteredInvoices = filteredInvoices.filter(inv => {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const due = new Date(inv.dueDate);
+                const diffTime = due - today;
+                const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    if (agingFilter === 'overdue') return days < 0;
-                    if (agingFilter === '0-30') return days >= 0 && days <= 30;
-                    if (agingFilter === '31-60') return days >= 31 && days <= 60;
-                    if (agingFilter === '61-90') return days >= 61 && days <= 90;
-                    return true;
-                });
-            }
+                // If no filters selected, show all (default behavior)
+                // However, checkboxes are checked by default in HTML, so it works.
+                if (selectedAging.length === 0) return true; 
+
+                let match = false;
+                if (selectedAging.includes('overdue') && days < 0) match = true;
+                if (selectedAging.includes('0-30') && days >= 0 && days <= 30) match = true;
+                if (selectedAging.includes('31-60') && days >= 31 && days <= 60) match = true;
+                if (selectedAging.includes('61-90') && days >= 61 && days <= 90) match = true;
+                if (selectedAging.includes('91+') && days > 90) match = true;
+
+                return match;
+            });
 
             // Calculations based on filtered set
             let totalSum = 0, totalPaid = 0, totalDue = 0;
@@ -812,12 +941,16 @@
             container.innerHTML = summaryHTML;
 
             if(filteredInvoices.length === 0) {
-                container.innerHTML += '<p class="text-center text-gray-400 mt-8">لا توجد بيانات</p>';
+                container.innerHTML += '<p class="text-center text-gray-400 mt-8">لا توجد بيانات تطابق الفلتر</p>';
                 return;
             }
 
             filteredInvoices.slice().reverse().forEach(inv => {
-                const sup = suppliers.find(s => s.id === inv.supplierId)?.name || 'مورد محذوف';
+                const supplierObj = suppliers.find(s => s.id === inv.supplierId);
+                const sup = supplierObj?.name || 'مورد محذوف';
+                const bank = supplierObj?.bank || '';
+                const bankHtml = bank ? `<span class="block text-xs text-gray-500 mt-0.5">الحساب البنكي: <span class="font-mono text-gray-700">${bank}</span></span>` : '';
+
                 const paid = getPaidAmount(inv.id);
                 const remaining = inv.totalAmount - paid;
                 
@@ -847,7 +980,11 @@
                 container.innerHTML += `
                     <div class="bg-white border rounded-xl overflow-hidden print-break-inside mb-4 shadow-sm">
                         <div class="bg-gray-50 p-3 border-b flex justify-between items-start">
-                            <div><h3 class="font-bold text-gray-800"># ${inv.invoiceNumber} <span class="text-xs font-normal text-gray-500">(${sup})</span></h3><p class="text-xs text-gray-400">تاريخ: ${inv.date} | استحقاق: ${inv.dueDate} ${daysText}</p></div>
+                            <div>
+                                <h3 class="font-bold text-gray-800"># ${inv.invoiceNumber} <span class="text-xs font-normal text-gray-500">(${sup})</span></h3>
+                                ${bankHtml}
+                                <p class="text-xs text-gray-400 mt-1">تاريخ: ${inv.date} | استحقاق: ${inv.dueDate} ${daysText}</p>
+                            </div>
                             <div class="text-left">
                                 <div class="flex items-center gap-3">
                                     <div class="text-right">
@@ -917,8 +1054,9 @@
             renderDashboard();
             renderSuppliers();
             populateSupplierSelect();
+            populatePaymentsYearFilter(); // Added this
             renderReports();
-            renderPaymentsHistory(); // Render payments history
+            renderPayments(); // And this
             if(currentUser.role === 'admin') renderUsers();
             lucide.createIcons();
         }
