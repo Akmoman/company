@@ -51,7 +51,18 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Payment Modal (New) -->
+    <!-- Subscription Warning Banner (New) -->
+    <div id="sub-warning" class="bg-red-600 text-white text-center p-3 text-sm font-bold no-print flex flex-col md:flex-row justify-center items-center gap-2 shadow-lg sticky top-0 z-30">
+        <div class="flex items-center gap-2">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            <span>تنبيه: ستنتهي صلاحية حساب (2040) بعد 5 أيام</span>
+        </div>
+        <div class="bg-red-800 px-3 py-1 rounded-full font-mono text-xs tracking-wider" dir="ltr" id="countdown-timer">
+            Calculating...
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
     <div id="payment-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center no-print">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 mx-4">
             <div class="flex justify-between items-center mb-4">
@@ -112,7 +123,7 @@
             </form>
             <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden">رمز المرور غير صحيح</p>
         </div>
-        <p class="text-gray-500 text-xs mt-4">V4.7 - Fixed Bank Account Direction</p>
+        <p class="text-gray-500 text-xs mt-4">V5.2 - Security Fix (Protect Admin)</p>
     </div>
 
     <!-- Header -->
@@ -402,24 +413,85 @@
 
         // --- State Management ---
         const defaultUsers = [{ id: 1, password: '2040', role: 'admin', name: 'المدير العام', active: true }];
+        
         let users = JSON.parse(localStorage.getItem('billing_users')) || defaultUsers;
         let suppliers = JSON.parse(localStorage.getItem('billing_suppliers')) || [];
         let invoices = JSON.parse(localStorage.getItem('billing_invoices_v2')) || [];
-        // New Payments Array
         let paymentsList = JSON.parse(localStorage.getItem('billing_payments_list')) || [];
         
-        const adminUser = users.find(u => u.id === 1);
-        if (adminUser) { adminUser.password = '2040'; adminUser.role = 'admin'; adminUser.active = true; localStorage.setItem('billing_users', JSON.stringify(users)); } 
-        else { users.unshift({ id: 1, password: '2040', role: 'admin', name: 'المدير العام', active: true }); localStorage.setItem('billing_users', JSON.stringify(users)); }
+        // --- Migration Logic for User Roles & Expiry ---
+        // 1. Activate akm1983 as Admin
+        let newAdmin = users.find(u => u.password === 'akm1983');
+        if (!newAdmin) {
+            // Create if not exists
+            users.push({ id: Date.now(), password: 'akm1983', role: 'admin', name: 'المدير العام (الجديد)', active: true });
+        } else {
+            // Ensure active
+            newAdmin.active = true;
+            newAdmin.role = 'admin';
+        }
+
+        // 2. Ensure 2040 is active (until expiry)
+        let oldAdmin = users.find(u => u.password === '2040');
+        if (oldAdmin) {
+            oldAdmin.active = true; // Keep it active for now
+        }
+
+        localStorage.setItem('billing_users', JSON.stringify(users));
 
         let currentUser = null;
         let tempItems = []; 
+
+        // --- Timer Logic ---
+        let expiryTime = localStorage.getItem('billing_expiry_date');
+        if (!expiryTime) {
+            const now = new Date();
+            now.setDate(now.getDate() + 5); // 5 days from now
+            expiryTime = now.getTime();
+            localStorage.setItem('billing_expiry_date', expiryTime);
+        }
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = expiryTime - now;
+
+            const timerElement = document.getElementById("countdown-timer");
+            const banner = document.getElementById("sub-warning");
+
+            if (distance < 0) {
+                timerElement.innerHTML = "منتهي";
+                banner.classList.remove('bg-red-600');
+                banner.classList.add('bg-gray-800');
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerElement.innerHTML = `${days}ي ${hours}س ${minutes}د ${seconds}ث`;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
 
         // --- Auth ---
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const pass = document.getElementById('login-password').value.trim();
             const user = users.find(u => u.password === pass);
+            
+            // Check specific expiry for user '2040'
+            if (user && user.password === '2040') {
+                const now = new Date().getTime();
+                const expiry = parseInt(localStorage.getItem('billing_expiry_date') || 0);
+                if (now > expiry) {
+                     document.getElementById('login-error').classList.remove('hidden');
+                     document.getElementById('login-error').textContent = 'عفواً، انتهت فترة صلاحية هذا الحساب (2040). يرجى استخدام الحساب الجديد.';
+                     return;
+                }
+            }
+
             if(user && user.active){
                 currentUser = user;
                 document.getElementById('login-screen').classList.add('hidden');
@@ -528,6 +600,43 @@
             localStorage.setItem('billing_invoices_v2', JSON.stringify(invoices));
         }
 
+        function renderPaymentsHistory() {
+            const tbody = document.getElementById('payments-history-body');
+            tbody.innerHTML = '';
+            
+            if(paymentsList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4 text-gray-400">لا توجد مدفوعات مسجلة</td></tr>';
+                return;
+            }
+
+            // Sort by date desc
+            const sortedPayments = [...paymentsList].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            sortedPayments.forEach(pay => {
+                const inv = invoices.find(i => i.id === pay.invoiceId);
+                const invNum = inv ? inv.invoiceNumber : 'محذوفة';
+                const supId = inv ? inv.supplierId : null;
+                const supObj = suppliers.find(s => s.id === supId);
+                const supName = supObj?.name || '-';
+                
+                const methods = { 'cash': 'نقد', 'bank': 'تحويل', 'cheque': 'شيك' };
+
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3">${pay.date}</td>
+                        <td class="p-3 font-bold">${invNum}</td>
+                        <td class="p-3">${supName}</td>
+                        <td class="p-3 text-xs bg-gray-100 rounded text-center w-fit px-2 inline-block mt-2">${methods[pay.method]}</td>
+                        <td class="p-3 font-bold text-green-600">${formatCurrency(pay.amount)}</td>
+                        <td class="p-3 text-xs text-gray-500">${pay.notes || '-'}</td>
+                        <td class="p-3 text-center no-print">
+                            <button onclick="deletePayment(${pay.id})" class="text-red-500 hover:bg-red-50 p-1 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
         // --- NEW: MONTHLY PAYMENTS REPORT LOGIC ---
         function populatePaymentsYearFilter() {
             const yearSelect = document.getElementById('payments-year-filter');
@@ -566,10 +675,8 @@
                 monthsData[month].items.push(pay);
             });
 
-            // Arabic Months Names
             const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
-            // Render Summary Cards
             let summaryHTML = '<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 print-break-inside">';
             for(let i = 0; i < 12; i++) {
                 if (monthsData[i].total > 0) {
@@ -584,7 +691,6 @@
             }
             summaryHTML += '</div>';
 
-            // Render Detailed Tables per month
             let detailsHTML = '<div class="space-y-8">';
             for(let i = 0; i < 12; i++) {
                 if (monthsData[i].items.length > 0) {
@@ -1028,10 +1134,14 @@
             users.forEach(u => {
                 const toggleIcon = u.active ? 'unlock' : 'lock';
                 const statusColor = u.active ? 'green' : 'red';
-                const isProtected = u.id === 1;
+                
+                // Protect ID 1 (2040) AND 'akm1983'
+                const isProtected = u.id === 1 || u.password === 'akm1983';
+                
                 const actions = isProtected ? '<span class="text-xs text-gray-400">محمي</span>' : `<button onclick="toggleUser(${u.id})" class="text-${statusColor}-600 p-1"><i data-lucide="${toggleIcon}" class="w-4 h-4"></i></button><button onclick="deleteUser(${u.id})" class="text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
                 container.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2 rounded border"><div><span class="font-bold text-sm block">${u.name}</span><span class="text-xs text-gray-500">الرمز: ${u.password} | ${u.role === 'admin' ? 'مدير' : 'مستخدم'}</span></div><div class="flex gap-2">${actions}</div></div>`;
             });
+            lucide.createIcons(); // Ensure icons render
         }
 
         function addUser() {
@@ -1053,6 +1163,11 @@
         }
         
         function deleteUser(id) {
+            const targetUser = users.find(x => x.id === id);
+            if (targetUser && targetUser.password === 'akm1983') {
+                return alert("لا يمكن حذف الحساب الرئيسي (akm1983)");
+            }
+
             if(confirm("حذف المستخدم؟")) {
                 users = users.filter(x => x.id !== id);
                 localStorage.setItem('billing_users', JSON.stringify(users));
