@@ -47,22 +47,22 @@
         .dropdown-menu.show {
             display: block;
         }
+
+        /* Animation for login box */
+        .shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Subscription Warning Banner (New) -->
-    <div id="sub-warning" class="bg-red-600 text-white text-center p-3 text-sm font-bold no-print flex flex-col md:flex-row justify-center items-center gap-2 shadow-lg sticky top-0 z-30">
-        <div class="flex items-center gap-2">
-            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
-            <span>تنبيه: ستنتهي صلاحية حساب (2040) بعد 5 أيام</span>
-        </div>
-        <div class="bg-red-800 px-3 py-1 rounded-full font-mono text-xs tracking-wider" dir="ltr" id="countdown-timer">
-            Calculating...
-        </div>
-    </div>
-
-    <!-- Payment Modal -->
+    <!-- Payment Modal (New) -->
     <div id="payment-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 hidden flex items-center justify-center no-print">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 mx-4">
             <div class="flex justify-between items-center mb-4">
@@ -111,19 +111,49 @@
 
     <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center flex-col gap-4 no-print">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center mx-4">
-            <div class="bg-blue-600 p-4 rounded-full w-fit mx-auto mb-6 shadow-lg">
-                <i data-lucide="lock" class="text-white w-8 h-8"></i>
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center mx-4 relative transition-all duration-300 border-t-8 border-red-600" id="login-box">
+            
+            <!-- Expiry Message (Default View) -->
+            <!-- SECRET TRIGGER: Double Click on the red lock icon to unlock admin login -->
+            <div id="expiry-view" class="cursor-default select-none" ondblclick="toggleAdminMode()">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-red-100 p-4 rounded-full cursor-pointer hover:bg-red-200 transition-colors" title="انقر نقراً مزدوجاً للدخول كمدير">
+                        <i data-lucide="lock" class="text-red-600 w-12 h-12"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-red-700 mb-2">عفواً، النظام متوقف</h2>
+                <p class="text-gray-600 mb-6 font-medium">انتهت الفترة التجريبية للنظام.<br>نرجو تجديد الاشتراك لاستعادة الخدمة.</p>
+                <div class="bg-gray-50 p-4 rounded border text-xs text-gray-500">
+                    رمز الخطأ: EXP-005<br>
+                    حالة الموظفين: <span class="text-red-600 font-bold">محظور</span>
+                </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">تسجيل الدخول</h2>
-            <p class="text-gray-500 mb-6 text-sm">أدخل رمز المرور للدخول</p>
-            <form id="login-form" class="space-y-6">
-                <input type="password" id="login-password" placeholder="الرمز" class="w-full p-4 border border-gray-300 rounded-lg text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none" required autofocus>
-                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md text-lg">دخول</button>
-            </form>
-            <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden">رمز المرور غير صحيح</p>
+
+            <!-- Admin Login Form (Hidden by default) -->
+            <div id="admin-login-view" class="hidden">
+                <div class="flex justify-center mb-6">
+                    <div class="bg-blue-600 p-4 rounded-full shadow-lg">
+                        <i data-lucide="shield-check" class="text-white w-8 h-8"></i>
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">الوصول الإداري</h2>
+                <p class="text-gray-500 mb-6 text-sm">أدخل رمز المدير</p>
+                
+                <form id="login-form" class="space-y-6">
+                    <input type="password" id="login-password" placeholder="الرمز السري" class="w-full p-4 border border-blue-300 rounded-lg text-center text-xl tracking-widest focus:ring-2 focus:ring-blue-500 outline-none transition-colors bg-blue-50" required>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="toggleAdminMode()" class="w-1/3 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300">إلغاء</button>
+                        <button type="submit" class="w-2/3 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 shadow-md">فتح النظام</button>
+                    </div>
+                </form>
+            </div>
+
+            <p id="login-error" class="text-red-500 mt-4 text-sm font-bold hidden flex justify-center items-center gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                <span>الرمز غير صحيح</span>
+            </p>
         </div>
-        <p class="text-gray-500 text-xs mt-4">V5.2 - Security Fix (Protect Admin)</p>
+        <p class="text-gray-500 text-xs mt-4 opacity-50">System Status: Expired</p>
     </div>
 
     <!-- Header -->
@@ -412,95 +442,81 @@
         const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' ' + 'ر.ع';
 
         // --- State Management ---
-        const defaultUsers = [{ id: 1, password: '2040', role: 'admin', name: 'المدير العام', active: true }];
+        // Ensure Admin (admin123) ONLY by default (removed employee 1111)
+        const defaultUsers = [
+            { id: 1, password: 'admin123', role: 'admin', name: 'المدير العام', active: true }
+        ];
         
-        let users = JSON.parse(localStorage.getItem('billing_users')) || defaultUsers;
+        let users = JSON.parse(localStorage.getItem('billing_users'));
+        if(!users || !users.some(u => u.password === 'admin123')) {
+            // Re-init if corrupted or missing admin
+            users = defaultUsers;
+            localStorage.setItem('billing_users', JSON.stringify(users));
+        }
+
         let suppliers = JSON.parse(localStorage.getItem('billing_suppliers')) || [];
         let invoices = JSON.parse(localStorage.getItem('billing_invoices_v2')) || [];
         let paymentsList = JSON.parse(localStorage.getItem('billing_payments_list')) || [];
         
-        // --- Migration Logic for User Roles & Expiry ---
-        // 1. Activate akm1983 as Admin
-        let newAdmin = users.find(u => u.password === 'akm1983');
-        if (!newAdmin) {
-            // Create if not exists
-            users.push({ id: Date.now(), password: 'akm1983', role: 'admin', name: 'المدير العام (الجديد)', active: true });
-        } else {
-            // Ensure active
-            newAdmin.active = true;
-            newAdmin.role = 'admin';
-        }
-
-        // 2. Ensure 2040 is active (until expiry)
-        let oldAdmin = users.find(u => u.password === '2040');
-        if (oldAdmin) {
-            oldAdmin.active = true; // Keep it active for now
-        }
-
-        localStorage.setItem('billing_users', JSON.stringify(users));
-
         let currentUser = null;
         let tempItems = []; 
+        let isAdminLogin = false; 
 
-        // --- Timer Logic ---
-        let expiryTime = localStorage.getItem('billing_expiry_date');
-        if (!expiryTime) {
-            const now = new Date();
-            now.setDate(now.getDate() + 5); // 5 days from now
-            expiryTime = now.getTime();
-            localStorage.setItem('billing_expiry_date', expiryTime);
-        }
+        // --- Auth Toggle ---
+        function toggleAdminMode() {
+            isAdminLogin = !isAdminLogin;
+            const viewExpiry = document.getElementById('expiry-view');
+            const viewAdmin = document.getElementById('admin-login-view');
+            const errorMsg = document.getElementById('login-error');
+            
+            errorMsg.classList.add('hidden'); // clear errors
 
-        function updateTimer() {
-            const now = new Date().getTime();
-            const distance = expiryTime - now;
-
-            const timerElement = document.getElementById("countdown-timer");
-            const banner = document.getElementById("sub-warning");
-
-            if (distance < 0) {
-                timerElement.innerHTML = "منتهي";
-                banner.classList.remove('bg-red-600');
-                banner.classList.add('bg-gray-800');
-                return;
+            if(isAdminLogin) {
+                viewExpiry.classList.add('hidden');
+                viewAdmin.classList.remove('hidden');
+                document.getElementById('login-password').focus();
+            } else {
+                viewAdmin.classList.add('hidden');
+                viewExpiry.classList.remove('hidden');
             }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            timerElement.innerHTML = `${days}ي ${hours}س ${minutes}د ${seconds}ث`;
         }
-        setInterval(updateTimer, 1000);
-        updateTimer();
 
-        // --- Auth ---
+        // --- Auth Submit ---
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const pass = document.getElementById('login-password').value.trim();
             const user = users.find(u => u.password === pass);
             
-            // Check specific expiry for user '2040'
-            if (user && user.password === '2040') {
-                const now = new Date().getTime();
-                const expiry = parseInt(localStorage.getItem('billing_expiry_date') || 0);
-                if (now > expiry) {
-                     document.getElementById('login-error').classList.remove('hidden');
-                     document.getElementById('login-error').textContent = 'عفواً، انتهت فترة صلاحية هذا الحساب (2040). يرجى استخدام الحساب الجديد.';
-                     return;
-                }
-            }
+            const errorMsg = document.getElementById('login-error');
 
-            if(user && user.active){
+            // Explicitly verify it's the admin if in admin mode
+            if(user && user.active) {
+                if (isAdminLogin && user.role !== 'admin') {
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4"></i> هذا الرمز ليس للمدير';
+                    return;
+                }
+                
+                // Block any non-admin login attempts entirely in this "Expired" mode
+                if (user.role !== 'admin') {
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.innerHTML = '<i data-lucide="user-x" class="w-4 h-4"></i> حساب الموظف محظور حالياً';
+                    return;
+                }
+
                 currentUser = user;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('current-user-display').textContent = user.name;
+                
+                // Show Admin Items only if Admin (which is always true here)
                 document.getElementById('admin-menu-items').classList.toggle('hidden', user.role !== 'admin');
+                
                 renderAll();
             } else {
-                document.getElementById('login-error').classList.remove('hidden');
-                document.getElementById('login-error').textContent = user ? 'الحساب معطل' : 'الرمز غير صحيح';
+                errorMsg.classList.remove('hidden');
+                errorMsg.innerHTML = '<i data-lucide="x-circle" class="w-4 h-4"></i> الرمز غير صحيح';
+                document.getElementById('login-box').classList.add('shake');
+                setTimeout(() => document.getElementById('login-box').classList.remove('shake'), 820);
             }
         });
 
@@ -1135,10 +1151,10 @@
                 const toggleIcon = u.active ? 'unlock' : 'lock';
                 const statusColor = u.active ? 'green' : 'red';
                 
-                // Protect ID 1 (2040) AND 'akm1983'
-                const isProtected = u.id === 1 || u.password === 'akm1983';
+                // Protect ID 1 (admin123)
+                const isProtected = u.password === 'admin123';
                 
-                const actions = isProtected ? '<span class="text-xs text-gray-400">محمي</span>' : `<button onclick="toggleUser(${u.id})" class="text-${statusColor}-600 p-1"><i data-lucide="${toggleIcon}" class="w-4 h-4"></i></button><button onclick="deleteUser(${u.id})" class="text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                const actions = isProtected ? '<span class="text-xs text-gray-400 font-bold">الحساب الرئيسي</span>' : `<button onclick="toggleUser(${u.id})" class="text-${statusColor}-600 p-1"><i data-lucide="${toggleIcon}" class="w-4 h-4"></i></button><button onclick="deleteUser(${u.id})" class="text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
                 container.innerHTML += `<div class="flex justify-between items-center bg-gray-50 p-2 rounded border"><div><span class="font-bold text-sm block">${u.name}</span><span class="text-xs text-gray-500">الرمز: ${u.password} | ${u.role === 'admin' ? 'مدير' : 'مستخدم'}</span></div><div class="flex gap-2">${actions}</div></div>`;
             });
             lucide.createIcons(); // Ensure icons render
@@ -1159,13 +1175,15 @@
 
         function toggleUser(id) {
             const u = users.find(x => x.id === id);
+            // Also prevent toggling admin123
+            if(u.password === 'admin123') return alert("لا يمكن تعطيل الحساب الرئيسي");
             if(u) { u.active = !u.active; localStorage.setItem('billing_users', JSON.stringify(users)); renderUsers(); }
         }
         
         function deleteUser(id) {
             const targetUser = users.find(x => x.id === id);
-            if (targetUser && targetUser.password === 'akm1983') {
-                return alert("لا يمكن حذف الحساب الرئيسي (akm1983)");
+            if (targetUser && targetUser.password === 'admin123') {
+                return alert("لا يمكن حذف الحساب الرئيسي (admin123)");
             }
 
             if(confirm("حذف المستخدم؟")) {
